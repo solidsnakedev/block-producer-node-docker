@@ -99,7 +99,7 @@ RUN cd src && \
 # Delete src folder
 RUN rm -r /src
 
-RUN mkdir -P /node/configuration
+RUN mkdir -p /node/configuration
 
 # Get latest config files from https://book.world.dev.cardano.org/environments.html
 RUN curl -s -o /node/configuration/config.json https://book.world.dev.cardano.org/environments/mainnet/config.json \
