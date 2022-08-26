@@ -100,11 +100,10 @@ RUN cd src && \
 RUN rm -r /src
 
 # Get latest config files from https://book.world.dev.cardano.org/environments.html
-RUN wget -P /node/configuration \
-    https://book.world.dev.cardano.org/environments/mainnet/config.json \
-    https://book.world.dev.cardano.org/environments/mainnet/byron-genesis.json \
-    https://book.world.dev.cardano.org/environments/mainnet/shelley-genesis.json \
-    https://book.world.dev.cardano.org/environments/mainnet/alonzo-genesis.json
+RUN curl -s -o /node/configuration/config.json https://book.world.dev.cardano.org/environments/mainnet/config.json \
+    curl -s -o /node/configuration/byron-genesis.json https://book.world.dev.cardano.org/environments/mainnet/byron-genesis.json \
+    curl -s -o /node/configuration/shelley-genesis.json https://book.world.dev.cardano.org/environments/mainnet/shelley-genesis.json \
+    curl -s -o /node/configuration/alonzo-genesis.json https://book.world.dev.cardano.org/environments/mainnet/alonzo-genesis.json
 
 # Change config to save them in /node/log/node.log file instead of stdout
 RUN sed -i 's/StdoutSK/FileSK/' /node/configuration/config.json && \
