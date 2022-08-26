@@ -1,6 +1,6 @@
 services:
 
-  cardano-node-relay:
+  cardano-node-bp:
     build: .
     image: cardano-node-bp
     container_name: cardano-node-bp
@@ -26,4 +26,4 @@ services:
     volumes:
       - '/:/host:ro,rslave'
     depends_on:
-      - cardano-node-relay
+      - cardano-node-bp
