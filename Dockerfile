@@ -119,7 +119,7 @@ ARG REPLAY_PORT
 RUN echo '{\n\
   "Producers": [\n\
     {\n\
-      "addr": "194.163.158.69", #Relay IP Address\n\
+      "addr": "194.163.158.69",\n\
       "port": 6000,\n\
       "valency": 1\n\
     }\n\
