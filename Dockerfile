@@ -119,13 +119,13 @@ ARG REPLAY_PORT
 RUN echo '{\n\
   "Producers": [\n\
     {\n\
-      "addr": "${RELAY_IP}", #Relay IP Address\n\
-      "port": ${REPLAY_PORT},\n\
+      "addr": "194.163.158.69", #Relay IP Address\n\
+      "port": 6000,\n\
       "valency": 1\n\
     }\n\
   ]\n\
 }'\
->> /node/topology.json
+>> /node/configuration/topology.json
 
 # Update libsodium PATH
 ENV LD_LIBRARY_PATH="/usr/local/lib:$LD_LIBRARY_PATH"
