@@ -110,7 +110,7 @@ RUN mkdir -p /node/configuration
 #RUN curl -s -o /node/configuration/shelley-genesis.json https://book.world.dev.cardano.org/environments/mainnet/shelley-genesis.json
 #RUN curl -s -o /node/configuration/alonzo-genesis.json https://book.world.dev.cardano.org/environments/mainnet/alonzo-genesis.json
 
-COPY config.json /node/configuration
+COPY configuration/config.json /node/configuration
 
 
 # Change config to save them in /node/log/node.log file instead of stdout
@@ -122,10 +122,10 @@ RUN sed -i 's/StdoutSK/FileSK/' /node/configuration/config.json && \
 ARG RELAY_IP
 ARG REPLAY_PORT
 
-COPY topology.json /node/configuration
-COPY shelley-genesis.json /node/configuration
-COPY byron-genesis.json /node/configuration
-COPY alonzo-genesis.json /node/configuration
+COPY configuration/topology.json /node/configuration
+COPY configuration/shelley-genesis.json /node/configuration
+COPY configuration/byron-genesis.json /node/configuration
+COPY configuration/alonzo-genesis.json /node/configuration
 
 # Update libsodium PATH
 ENV LD_LIBRARY_PATH="/usr/local/lib:$LD_LIBRARY_PATH"
