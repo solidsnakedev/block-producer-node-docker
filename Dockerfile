@@ -119,16 +119,7 @@ RUN sed -i 's/StdoutSK/FileSK/' /node/configuration/config.json && \
 ARG RELAY_IP
 ARG REPLAY_PORT
 
-RUN echo '{\n\
-  "Producers": [\n\
-    {\n\
-      "addr": "194.163.158.69",\n\
-      "port": 6000,\n\
-      "valency": 1\n\
-    }\n\
-  ]\n\
-}'\
->> /node/configuration/topology.json
+COPY topology.json /node/configuration
 
 # Update libsodium PATH
 ENV LD_LIBRARY_PATH="/usr/local/lib:$LD_LIBRARY_PATH"
