@@ -103,7 +103,9 @@ RUN mkdir -p /node/configuration
 
 # Get latest config files from https://book.world.dev.cardano.org/environments.html
 #RUN curl -s -o /node/configuration/config.json https://book.world.dev.cardano.org/environments/mainnet/config.json
-RUN curl -s -o /node/configuration/config.json https://hydra.iohk.io/build/8111119/download/1/mainnet-config.json
+#RUN curl -s -o /node/configuration/config.json https://hydra.iohk.io/build/8111119/download/1/mainnet-config.json
+RUN curl -s -o /node/configuration/config.json https://book.world.dev.cardano.org/environments/preprod/config.json
+
 RUN curl -s -o /node/configuration/byron-genesis.json https://book.world.dev.cardano.org/environments/mainnet/byron-genesis.json
 RUN curl -s -o /node/configuration/shelley-genesis.json https://book.world.dev.cardano.org/environments/mainnet/shelley-genesis.json
 RUN curl -s -o /node/configuration/alonzo-genesis.json https://book.world.dev.cardano.org/environments/mainnet/alonzo-genesis.json
