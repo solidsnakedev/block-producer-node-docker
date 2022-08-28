@@ -49,8 +49,8 @@ Remember to save the pool keys in ./node/pool-keys
 
 ## Build cardano node docker image
 
-* replace `<relay-ip-address>` with the IP Address of the block producer node
-* replace `<relay-port>` with the Port number of the block producer node
+* replace `<relay-ip-address>` with the IP Address of the relay node
+* replace `<relay-port>` with the Port number of the relay node
 
 ```
 DOCKER_BUILDKIT=1 docker compose build \
