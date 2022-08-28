@@ -99,19 +99,12 @@ RUN cd src && \
 # Delete src folder
 RUN rm -r /src
 
-RUN mkdir -p /node/configuration
-
-# Get latest config files from https://book.world.dev.cardano.org/environments.html
-#RUN curl -s -o /node/configuration/config.json https://book.world.dev.cardano.org/environments/mainnet/config.json
-#RUN curl -s -o /node/configuration/config.json https://hydra.iohk.io/build/8111119/download/1/mainnet-config.json
-#RUN curl -s -o /node/configuration/config.json https://book.world.dev.cardano.org/environments/preprod/config.json
-
-#RUN curl -s -o /node/configuration/byron-genesis.json https://book.world.dev.cardano.org/environments/mainnet/byron-genesis.json
-#RUN curl -s -o /node/configuration/shelley-genesis.json https://book.world.dev.cardano.org/environments/mainnet/shelley-genesis.json
-#RUN curl -s -o /node/configuration/alonzo-genesis.json https://book.world.dev.cardano.org/environments/mainnet/alonzo-genesis.json
-
-COPY configuration/config.json /node/configuration
-
+# Get latest config files
+RUN wget -P /node/configuration \
+    https://raw.githubusercontent.com/input-output-hk/cardano-world/master/docs/environments/mainnet/config.json \
+    https://raw.githubusercontent.com/input-output-hk/cardano-world/master/docs/environments/mainnet/byron-genesis.json \
+    https://raw.githubusercontent.com/input-output-hk/cardano-world/master/docs/environments/mainnet/shelley-genesis.json \
+    https://raw.githubusercontent.com/input-output-hk/cardano-world/master/docs/environments/mainnet/alonzo-genesis.json
 
 # Change config to save them in /node/log/node.log file instead of stdout
 RUN sed -i 's/StdoutSK/FileSK/' /node/configuration/config.json && \
@@ -119,13 +112,11 @@ RUN sed -i 's/StdoutSK/FileSK/' /node/configuration/config.json && \
     sed -i 's/\"TraceBlockFetchDecisions\": false/\"TraceBlockFetchDecisions\": true/' /node/configuration/config.json && \
     sed -i 's/\"127.0.0.1\"/\"0.0.0.0\"/' /node/configuration/config.json
 
+# TODO: find a way to create a topology.json file when building the image
+COPY configuration/topology.json /node/configuration
+
 ARG RELAY_IP
 ARG REPLAY_PORT
-
-COPY configuration/topology.json /node/configuration
-COPY configuration/shelley-genesis.json /node/configuration
-COPY configuration/byron-genesis.json /node/configuration
-COPY configuration/alonzo-genesis.json /node/configuration
 
 # Update libsodium PATH
 ENV LD_LIBRARY_PATH="/usr/local/lib:$LD_LIBRARY_PATH"
