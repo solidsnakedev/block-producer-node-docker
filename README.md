@@ -62,3 +62,15 @@ DOCKER_BUILDKIT=1 docker compose build \
 ```
 docker compose up -d
 ```
+
+
+## Upgrade Node
+
+```
+$ docker compose down
+```
+```
+$ DOCKER_BUILDKIT=1 docker compose build \
+    --build-arg RELAY_IP=<relay-ip-address> \
+    --build-arg RELAY_PORT=<relay-port>
+```
