@@ -62,8 +62,8 @@ RUN echo  "{\n" \
           "   \"localRoots\": [\n" \
           "         {\n" \
           "           \"accessPoints\": [\n" \
-          "           { \"address\": \"${RELAY_IP}\", \"port\": ${RELAY_PORT} }\n" \
-          "           ],\n" \
+          "               { \"address\": \"${RELAY_IP}\", \"port\": ${RELAY_PORT} }\n" \
+          "             ],\n" \
           "           \"advertise\": false,\n" \
           "           \"valency\": 1\n" \
           "         }\n" \
