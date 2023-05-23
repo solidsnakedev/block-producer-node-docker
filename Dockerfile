@@ -77,15 +77,16 @@ FROM ubuntu:latest
 RUN apt-get update -y && \
     apt-get install automake build-essential pkg-config libffi-dev libgmp-dev libssl-dev libtinfo-dev libsystemd-dev zlib1g-dev make g++ tmux git jq wget libncursesw5 libtool autoconf liblmdb-dev curl vim -y
 
+RUN mkdir src
+
 RUN TAG=$(curl -s https://api.github.com/repos/input-output-hk/cardano-node/releases/latest | jq -r .tag_name) && \
-    curl -o cardano-node.tar.gz  https://update-cardano-mainnet.iohk.io/cardano-node-releases/cardano-node-${TAG}-linux.tar.gz && \
-    tar -xvf cardano-node.tar.gz && \
-    mv cardano-node /usr/local/bin && \
-    mv cardano-cli /usr/local/bin
+    curl -o src/cardano-node.tar.gz  https://update-cardano-mainnet.iohk.io/cardano-node-releases/cardano-node-${TAG}-linux.tar.gz && \
+    tar -xvf src/cardano-node.tar.gz && \
+    mv src/cardano-node /usr/local/bin && \
+    mv src/cardano-cli /usr/local/bin
 
 # Install libsodium
-RUN mkdir src && \
-    cd src && \
+RUN cd src && \
     git clone https://github.com/input-output-hk/libsodium && \
     cd libsodium && \
     git checkout dbb48cc && \
