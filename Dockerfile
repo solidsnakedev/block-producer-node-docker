@@ -107,13 +107,16 @@ RUN cd src && \
 # Delete src folder
 RUN rm -r /src
 
+# https://raw.githubusercontent.com/input-output-hk/cardano-world/master/docs/environments/mainnet/config.json \
+
 # Get latest config files
 RUN wget -P /node/configuration \
-    https://raw.githubusercontent.com/input-output-hk/cardano-world/master/docs/environments/mainnet/config.json \
     https://raw.githubusercontent.com/input-output-hk/cardano-world/master/docs/environments/mainnet/byron-genesis.json \
     https://raw.githubusercontent.com/input-output-hk/cardano-world/master/docs/environments/mainnet/shelley-genesis.json \
     https://raw.githubusercontent.com/input-output-hk/cardano-world/master/docs/environments/mainnet/alonzo-genesis.json \
     https://raw.githubusercontent.com/input-output-hk/cardano-world/master/docs/environments/mainnet/conway-genesis.json
+
+COPY config.json /node/configuration
 
 # Change config to save them in /node/log/node.log file instead of stdout
 RUN sed -i 's/StdoutSK/FileSK/' /node/configuration/config.json && \
@@ -124,17 +127,21 @@ RUN sed -i 's/StdoutSK/FileSK/' /node/configuration/config.json && \
 ARG RELAY_IP
 ARG REPLAY_PORT
 
-RUN echo  "{" \
-          "  \"Producers\": [" \
-          "    {" \
-          "      \"addr\": \"${RELAY_IP}\"," \
-          "      \"port\": ${REPLAY_PORT}," \
-          "      \"valency\": 1" \
-          "    }" \
-          "  ]" \
-          "}" \
+RUN echo  "{\n" \
+          "   \"localRoots\": [\n" \
+          "         {\n" \
+          "           \"accessPoints\": [\n" \
+          "           { \"address\": \"${RELAY_IP}\", \"port\": ${REPLAY_PORT} }\n" \
+          "           ],\n" \
+          "           \"advertise\": false,\n" \
+          "           \"valency\": 1\n" \
+          "         }\n" \
+          "     ],\n" \
+          "   \"publicRoots\": [\n" \
+          "     ],\n" \
+          "   \"useLedgerAfterSlot\": -1\n" \
+          "}\n" \
           > /node/configuration/topology.json
-
 
 # Update libsodium PATH
 ENV LD_LIBRARY_PATH="/usr/local/lib:$LD_LIBRARY_PATH"
