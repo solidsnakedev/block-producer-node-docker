@@ -80,10 +80,10 @@ RUN apt-get update -y && \
 RUN mkdir src
 
 RUN TAG=$(curl -s https://api.github.com/repos/input-output-hk/cardano-node/releases/latest | jq -r .tag_name) && \
-    curl -o src/cardano-node.tar.gz  https://update-cardano-mainnet.iohk.io/cardano-node-releases/cardano-node-${TAG}-linux.tar.gz && \
-    tar -xvf src/cardano-node.tar.gz && \
-    mv src/cardano-node /usr/local/bin && \
-    mv src/cardano-cli /usr/local/bin
+    curl -o /src/cardano-node.tar.gz  https://update-cardano-mainnet.iohk.io/cardano-node-releases/cardano-node-${TAG}-linux.tar.gz && \
+    tar -xvf /src/cardano-node.tar.gz && \
+    mv /src/cardano-node /usr/local/bin && \
+    mv /src/cardano-cli /usr/local/bin
 
 # Install libsodium
 RUN cd src && \
