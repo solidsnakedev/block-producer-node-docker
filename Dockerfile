@@ -127,13 +127,13 @@ RUN sed -i 's/StdoutSK/FileSK/' /node/configuration/config.json && \
     sed -i 's/\"127.0.0.1\"/\"0.0.0.0\"/' /node/configuration/config.json
 
 ARG RELAY_IP
-ARG REPLAY_PORT
+ARG RELAY_PORT
 
 RUN echo  "{\n" \
           "   \"localRoots\": [\n" \
           "         {\n" \
           "           \"accessPoints\": [\n" \
-          "           { \"address\": \"${RELAY_IP}\", \"port\": ${REPLAY_PORT} }\n" \
+          "           { \"address\": \"${RELAY_IP}\", \"port\": ${RELAY_PORT} }\n" \
           "           ],\n" \
           "           \"advertise\": false,\n" \
           "           \"valency\": 1\n" \
