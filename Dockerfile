@@ -8,7 +8,7 @@ RUN mkdir src
 
 RUN TAG=$(curl -s https://api.github.com/repos/input-output-hk/cardano-node/releases/latest | jq -r .tag_name) && \
     cd src && \
-    wget -cO - https://github.com/input-output-hk/cardano-node/releases/download/${TAG}/cardano-node-${TAG}-linux.tar.gz > cardano-node.tag.gz && \
+    wget -cO - https://github.com/input-output-hk/cardano-node/releases/download/${TAG}/cardano-node-${TAG}-linux.tar.gz > cardano-node.tar.gz && \
     tar -xvf cardano-node.tar.gz && \
     mv cardano-node /usr/local/bin && \
     mv cardano-cli /usr/local/bin
