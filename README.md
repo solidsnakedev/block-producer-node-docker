@@ -53,9 +53,9 @@ Remember to save the pool keys in ./node/pool-keys
 * replace `<relay-port>` with the Port number of the relay node
 
 ```
-DOCKER_BUILDKIT=1 docker compose build \
-    --build-arg RELAY_IP=<relay-ip-address> \
-    --build-arg RELAY_PORT=<relay-port>
+docker compose -f ./mainnet/Dockerfile build \
+    --build-arg RELAY1_IPj=<relay-ip-address> \
+    --build-arg RELAY1_PORT=<relay-port>
 ```
 
 ## Run container

@@ -1,0 +1,29 @@
+services:
+
+  cardano-node-preview-bp:
+    build: .
+    image: cardano-node-preview-bp
+    container_name: cardano-node-preview-bp
+    ports:
+      - 6002:6002 # Cardano node relay port
+      - 12792:12792 # Cardano node metrics
+    volumes:
+      - ./node/db/:/node/db
+      - ./node/ipc/:/node/ipc
+      - ./node/logs/:/node/logs
+      - ./node/pool-keys:/node/pool-keys
+
+  node_exporter: # Listening by default on port 9100
+    image: quay.io/prometheus/node-exporter:latest
+    container_name: node_exporter
+    ports:
+      - 9102:9102
+    command:
+      - '--path.rootfs=/host'
+    network_mode: host
+    pid: host
+    restart: unless-stopped
+    volumes:
+      - '/:/host:ro,rslave'
+    depends_on:
+      - cardano-node-preview-bp
