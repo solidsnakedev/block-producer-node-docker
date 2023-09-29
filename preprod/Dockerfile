@@ -54,24 +54,48 @@ RUN sed -i 's/StdoutSK/FileSK/' /node/configuration/config.json && \
     sed -i 's/\"TraceBlockFetchDecisions\": false/\"TraceBlockFetchDecisions\": true/' /node/configuration/config.json && \
     sed -i 's/\"127.0.0.1\"/\"0.0.0.0\"/' /node/configuration/config.json
 
-ARG RELAY_IP
-ARG RELAY_PORT
+ARG RELAY1_IP
+ARG RELAY1_PORT
 
-RUN echo  "{\n" \
-          "   \"localRoots\": [\n" \
-          "         {\n" \
-          "           \"accessPoints\": [\n" \
-          "               { \"address\": \"${RELAY_IP}\", \"port\": ${RELAY_PORT} }\n" \
-          "             ],\n" \
-          "           \"advertise\": false,\n" \
-          "           \"valency\": 1\n" \
-          "         }\n" \
-          "     ],\n" \
-          "   \"publicRoots\": [\n" \
-          "     ],\n" \
-          "   \"useLedgerAfterSlot\": -1\n" \
-          "}\n" \
-          > /node/configuration/topology.json
+ARG RELAY2_IP
+ARG RELAY2_PORT
+
+RUN \
+    if [ -n "${RELAY1_IP}" ] && [ -n "${RELAY1_PORT}" ] && [ -n "${RELAY2_IP}" ] && [ -n "${RELAY2_PORT}" ] ; then \
+    echo  "{\n" \
+    "   \"localRoots\": [\n" \
+    "         {\n" \
+    "           \"accessPoints\": [\n" \
+    "               { \"address\": \"${RELAY1_IP}\", \"port\": ${RELAY1_PORT} }, \n" \
+    "               { \"address\": \"${RELAY2_IP}\", \"port\": ${RELAY2_PORT} }\n" \
+    "             ],\n" \
+    "           \"advertise\": false,\n" \
+    "           \"valency\": 1\n" \
+    "         }\n" \
+    "     ],\n" \
+    "   \"publicRoots\": [\n" \
+    "     ],\n" \
+    "   \"useLedgerAfterSlot\": -1\n" \
+    "}\n" \
+    > /node/configuration/topology.json ; \
+    elif [ -n "${RELAY1_IP}" ] && [ -n "${RELAY1_PORT}" ] ; then \
+    echo  "{\n" \
+    "   \"localRoots\": [\n" \
+    "         {\n" \
+    "           \"accessPoints\": [\n" \
+    "               { \"address\": \"${RELAY1_IP}\", \"port\": ${RELAY1_PORT} }\n" \
+    "             ],\n" \
+    "           \"advertise\": false,\n" \
+    "           \"valency\": 1\n" \
+    "         }\n" \
+    "     ],\n" \
+    "   \"publicRoots\": [\n" \
+    "     ],\n" \
+    "   \"useLedgerAfterSlot\": -1\n" \
+    "}\n" \
+    > /node/configuration/topology.json ; \
+    else echo " *** Incorrect Setting ***" ; \
+    fi
 
 # Set node socket evironment for cardano-cli
 ENV CARDANO_NODE_SOCKET_PATH="/node/ipc/node.socket"

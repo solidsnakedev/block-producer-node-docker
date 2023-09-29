@@ -52,10 +52,20 @@ Remember to save the pool keys in ./node/pool-keys
 * replace `<relay-ip-address>` with the IP Address of the relay node
 * replace `<relay-port>` with the Port number of the relay node
 
+### 1 Relay
 ```
-docker compose -f ./mainnet/Dockerfile build \
-    --build-arg RELAY1_IPj=<relay-ip-address> \
+docker compose -f ./mainnet/docker-compose.yaml build \
+    --build-arg RELAY1_IP=<relay-ip-address> \
     --build-arg RELAY1_PORT=<relay-port>
+```
+ 
+### 2 Relays
+```
+docker compose -f ./mainnet/docker-compose.yaml build \
+    --build-arg RELAY1_IP=<relay-ip-address> \
+    --build-arg RELAY1_PORT=<relay-port> \
+    --build-arg RELAY2_IP=<relay-ip-address> \
+    --build-arg RELAY2_PORT=<relay-port>
 ```
 
 ## Run container
@@ -67,11 +77,11 @@ docker compose up -d
 ## Upgrade Node
 
 ```
-$ docker compose down
+docker compose down
 ```
 ```
-$ DOCKER_BUILDKIT=1 docker compose build \
+docker compose -f ./mainnet/docker-compose.yaml build \
     --no-cache \
-    --build-arg RELAY_IP=<relay-ip-address> \
-    --build-arg RELAY_PORT=<relay-port>
+    --build-arg RELAY1_IP=<relay-ip-address> \
+    --build-arg RELAY1_PORT=<relay-port>
 ```
