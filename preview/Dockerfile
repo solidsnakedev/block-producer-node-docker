@@ -94,7 +94,29 @@ RUN \
     "   \"useLedgerAfterSlot\": -1\n" \
     "}\n" \
     > /node/configuration/topology.json ; \
-    else echo " *** Incorrect Setting ***" ; \
+    else echo  "{\n" \
+    "   \"localRoots\": [\n" \
+    "         {\n" \
+    "           \"accessPoints\": [\n" \
+    "             ],\n" \
+    "           \"advertise\": false,\n" \
+    "           \"valency\": 1\n" \
+    "         }\n" \
+    "       ],\n" \
+    "   \"publicRoots\": [\n" \
+    "         {\n" \
+    "           \"accessPoints\": [\n" \
+    "               {\n" \
+    "                 \"address\": \"preview-node.world.dev.cardano.org\",\n" \
+    "                 \"port\": 30002\n" \
+    "               }\n" \
+    "             ],\n" \
+    "           \"advertise\": false\n" \
+    "         }\n" \
+    "       ],\n" \
+    "   \"useLedgerAfterSlot\": 322000\n" \
+    "}\n" \
+    > /node/configuration/topology.json ; \
     fi
 
 # Set node socket evironment for cardano-cli
