@@ -6,7 +6,7 @@ services:
     container_name: cardano-node-preview-bp
     ports:
       - 6002:6002 # Cardano node relay port
-      - 12792:12792 # Cardano node metrics
+      - 12792:12798 # Cardano node metrics
     volumes:
       - ./node/db/:/node/db
       - ./node/ipc/:/node/ipc
@@ -17,10 +17,9 @@ services:
     image: quay.io/prometheus/node-exporter:latest
     container_name: node_exporter
     ports:
-      - 9102:9102
+      - 9102:9100
     command:
       - '--path.rootfs=/host'
-    network_mode: host
     pid: host
     restart: unless-stopped
     volumes:
