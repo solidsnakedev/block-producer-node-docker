@@ -10,7 +10,8 @@ KESKEY="/node/pool-keys/kes.skey"
 VRFKEY="/node/pool-keys/vrf.skey"
 NODECERT="/node/pool-keys/node.cert"
 
-if [ -n ${KESKEY} ] && [ -n ${VRFKEY} ] && [ -n ${NODECERT} ]; then
+if [ -f ${KESKEY} ] && [ -f ${VRFKEY} ] && [ -f ${NODECERT} ]; then
+        echo "RUNNING with \n ${KESKEY} \n ${VRFKEY} \n ${NODECERT}"
         /usr/local/bin/cardano-node run \
                 --topology ${TOPOLOGY} \
                 --database-path ${DBPATH} \
@@ -22,6 +23,7 @@ if [ -n ${KESKEY} ] && [ -n ${VRFKEY} ] && [ -n ${NODECERT} ]; then
                 --shelley-vrf-key ${VRFKEY} \
                 --shelley-operational-certificate ${NODECERT}
 else
+        echo "RUNNING STAND-ALONE"
         /usr/local/bin/cardano-node run \
                 --topology ${TOPOLOGY} \
                 --database-path ${DBPATH} \
