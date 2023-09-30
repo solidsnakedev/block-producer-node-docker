@@ -10,7 +10,7 @@ KESKEY="/node/pool-keys/kes.skey"
 VRFKEY="/node/pool-keys/vrf.skey"
 NODECERT="/node/pool-keys/node.cert"
 
-if [ -n KESKEY ] && [ -n VRFKEY ] && -n [NODECERT]; then
+if [ -n KESKEY ] && [ -n VRFKEY ] && [ -n NODECERT ]; then
         /usr/local/bin/cardano-node run \
                 --topology ${TOPOLOGY} \
                 --database-path ${DBPATH} \
@@ -28,5 +28,5 @@ else
                 --socket-path ${SOCKETPATH} \
                 --host-addr ${HOSTADDR} \
                 --port ${PORT} \
-                --config ${CONFIG}\ 
+                --config ${CONFIG}
 fi
