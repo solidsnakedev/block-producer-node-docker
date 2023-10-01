@@ -1,5 +1,5 @@
 
-# Generate all the keys and certificates
+# Create Stake Pool Keys and Certificates
 
 ## Bootstrap cardano node as STAND-ALONE mode
 
@@ -15,6 +15,7 @@ cardano node must be sync at 100%
 docker exec -it cardano-node-preview-bp bash
 ```
 
+### Set environment variables
 ```
 NODE_HOME=/node
 POOL_KEYS=${NODE_HOME}/pool-keys
@@ -22,18 +23,22 @@ DATA=${NODE_HOME}/data
 CONFIGURATION=${NODE_HOME}/configuration
 ```
 
+### Generate -> `kes keys`
+
 ```
 cardano-cli node key-gen-KES \
     --verification-key-file ${POOL_KEYS}/kes.vkey \
     --signing-key-file ${POOL_KEYS}/kes.skey
 ```
 
+### Generate -> `vrf keys`
 ```
 cardano-cli node key-gen-VRF \
     --verification-key-file ${POOL_KEYS}/vrf.vkey \
     --signing-key-file ${POOL_KEYS}/vrf.skey
 ```
 
+### Generate -> `node keys`
 ```
 cardano-cli node key-gen \
     --cold-verification-key-file ${POOL_KEYS}/node.vkey \
@@ -55,7 +60,7 @@ echo kesPeriod: ${kesPeriod}
 startKesPeriod=${kesPeriod}
 echo startKesPeriod: ${startKesPeriod}
 ```
-
+### Generate -> `node certificate` 
 ```
 cardano-cli node issue-op-cert \
     --kes-verification-key-file ${POOL_KEYS}/kes.vkey \
@@ -64,19 +69,21 @@ cardano-cli node issue-op-cert \
     --kes-period ${startKesPeriod} \
     --out-file ${POOL_KEYS}/node.cert
 ```
-
+### Generate -> `payment keys`
 ```
 cardano-cli address key-gen \
     --verification-key-file ${POOL_KEYS}/payment.vkey \
     --signing-key-file ${POOL_KEYS}/payment.skey
 ```
 
+### Generate -> `stake keys`
 ```
 cardano-cli stake-address key-gen \
     --verification-key-file ${POOL_KEYS}/stake.vkey \
     --signing-key-file ${POOL_KEYS}/stake.skey
 ```
 
+### Generate -> `stake address`
 ```
 cardano-cli stake-address build  \
     --stake-verification-key-file ${POOL_KEYS}/stake.vkey \
@@ -84,6 +91,7 @@ cardano-cli stake-address build  \
     --testnet-magic 2
 ```
 
+### Generate -> `payment address`
 ```
 cardano-cli address build \
     --payment-verification-key-file ${POOL_KEYS}/payment.vkey \
@@ -92,6 +100,7 @@ cardano-cli address build \
     --testnet-magic 2
 ```
 
+### Generate -> `stake certificate`
 ```
 cardano-cli stake-address registration-certificate \
     --stake-verification-key-file ${POOL_KEYS}/stake.vkey \
@@ -108,6 +117,14 @@ cat ${POOL_KEYS}/payment.addr
 cardano-cli query utxo \
     --address $(cat ${POOL_KEYS}/payment.addr) \
     --testnet-magic 2
+```
+
+# Run Stake Pool
+
+* Backup all the keys from `node/pool-keys` except for `kes.skey` `vrf.skey` `node.cert`
+
+```
+docker compose up -d
 ```
 
 # Register Stake Address
@@ -197,7 +214,8 @@ cardano-cli transaction build-raw \
     --certificate-file ${POOL_KEYS}/stake.cert \
     --out-file ${DATA}/tx.raw
 ```
-### AIR GAPPED NODE
+***
+### Air gapped node
 
 ```
 cardano-cli transaction sign \
@@ -208,7 +226,8 @@ cardano-cli transaction sign \
     --out-file ${DATA}/tx.signed
 ```
 
-### BP NODE
+***
+### Block producer node
 ```
 cardano-cli transaction submit \
     --tx-file ${DATA}/tx.signed \
@@ -216,7 +235,7 @@ cardano-cli transaction submit \
 ```
 
 # Register Stake Pool
-## Requirements
+### Set environment variables
 
 ```
 NODE_HOME=/node
@@ -225,7 +244,7 @@ DATA=${NODE_HOME}/data
 CONFIGURATION=${NODE_HOME}/configuration
 ```
 
-## Download "pool metadata"
+### Download `pool metadata`
 ```
 URL_METADATA=https://solidsnakedev.github.io/poolMetadata.json
 ```
@@ -234,15 +253,15 @@ URL_METADATA=https://solidsnakedev.github.io/poolMetadata.json
 wget ${URL_METADATA} -O ${DATA}/pool_Metadata.json
 ```
 
-## Calculate the hash of your metadata file
+### Calculate the hash of your metadata file
 ```
 cardano-cli stake-pool metadata-hash --pool-metadata-file ${DATA}/pool_Metadata.json > ${DATA}/pool_MetadataHash.txt
 ```
 
 ***
 
-## Air-gapped machine
-## Update the below registration-certificate
+### Air-gapped node
+### Set environment variables
 ```
 PLEDGE=100000000000
 COST=340000000
@@ -250,6 +269,7 @@ MARGIN=0.019
 RELAY=194.163.164.5
 PORT=6000
 ```
+### Create pool registration
 ```
 cardano-cli stake-pool registration-certificate \
 --cold-verification-key-file ${POOL_KEYS}/node.vkey \
@@ -267,24 +287,23 @@ cardano-cli stake-pool registration-certificate \
 --out-file ${DATA}/pool-registration.cert
 ```
 
-## To honor your pledge, create a delegation certificate:
+### Create a delegation certificate:
 ```
 cardano-cli stake-address delegation-certificate \
 --stake-verification-key-file ${POOL_KEYS}/stake.vkey \
 --cold-verification-key-file ${POOL_KEYS}/node.vkey \
 --out-file ${DATA}/delegation.cert
 ```
-
 ***
 
-# Block producer
-## Find the tip of the blockchain
+## Block producer node
+### Find the tip of the blockchain
 ```
 currentSlot=$(cardano-cli query tip --testnet-magic 2 | jq -r '.slot')
 echo Current Slot: $currentSlot
 ```
 
-## Find your balance and UTXOs.
+### Find your balance and UTXOs.
 ```
 cardano-cli query utxo \
     --address $(cat ${POOL_KEYS}/payment.addr) \
@@ -314,7 +333,7 @@ echo Total available ADA balance: ${total_balance}
 echo Number of UTXOs: ${txcnt}
 ```
 
-## Get protocol parameters
+### Get protocol parameters
 ```
 cardano-cli query protocol-parameters \
   --testnet-magic 2 \
@@ -326,7 +345,7 @@ stakePoolDeposit=$(cat ${DATA}/protocol.json | jq -r '.stakePoolDeposit')
 echo stakePoolDeposit: $stakePoolDeposit
 ```
 
-## Draft the transaction
+### Draft the transaction
 ```
 cardano-cli transaction build-raw \
     ${tx_in} \
@@ -340,7 +359,7 @@ cardano-cli transaction build-raw \
 
 
 
-## Calculate the minimum fee:
+### Calculate the minimum fee:
 ```
 fee=$(cardano-cli transaction calculate-min-fee \
     --tx-body-file ${DATA}/tx.tmp \
@@ -352,20 +371,20 @@ fee=$(cardano-cli transaction calculate-min-fee \
     --protocol-params-file ${DATA}/protocol.json | awk '{ print $1 }')
 echo fee: $fee
 ```
-Add a bit more to the fees ++
+### Add extra fee
 
 ```
 fee=$((fee + 100000))
 echo fee: $fee
 ```
 
-## Calculate your change output.
+### Calculate your change output.
 ```
 txOut=$((${total_balance}-${stakePoolDeposit}-${fee}))
 echo txOut: ${txOut}
 ```
 
-## Build the transaction. 
+### Build the transaction. 
 ```
 cardano-cli transaction build-raw \
     ${tx_in} \
@@ -379,8 +398,8 @@ cardano-cli transaction build-raw \
 
 ***
 
-## Air-gapped machine
-## Sign the transaction.
+## Air-gapped node
+### Sign the transaction.
 ```
 cardano-cli transaction sign \
     --tx-body-file ${DATA}/tx.raw \
@@ -392,9 +411,9 @@ cardano-cli transaction sign \
 ```
 
 ***
-# Block producer
+## Block producer node
 
-## Send the transaction.
+### Send the transaction.
 ```
 cardano-cli transaction submit \
     --tx-file ${DATA}/tx.signed \
