@@ -11,7 +11,7 @@ VRFKEY="/node/pool-keys/vrf.skey"
 NODECERT="/node/pool-keys/node.cert"
 
 if [ -f ${KESKEY} ] && [ -f ${VRFKEY} ] && [ -f ${NODECERT} ]; then
-        echo "RUNNING with \n ${KESKEY} \n ${VRFKEY} \n ${NODECERT}"
+        echo -e "RUNNING with \n ${KESKEY} \n ${VRFKEY} \n ${NODECERT}"
         /usr/local/bin/cardano-node run \
                 --topology ${TOPOLOGY} \
                 --database-path ${DBPATH} \
