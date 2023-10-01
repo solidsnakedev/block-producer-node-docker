@@ -1,7 +1,7 @@
 #!/bin/bash
 
 HOSTADDR="0.0.0.0"
-PORT="6000"
+PORT="6002"
 TOPOLOGY="/node/configuration/topology.json"
 CONFIG="/node/configuration/config.json"
 DBPATH="/node/db"
