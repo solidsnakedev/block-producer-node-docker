@@ -1,0 +1,29 @@
+services:
+
+  cardano-node-sanchonet-bp:
+    build: .
+    image: cardano-node-sanchonet-bp
+    container_name: cardano-node-sanchonet-bp
+    ports:
+      - 6004:6004 # Cardano node relay port
+      - 12794:12798 # Cardano node metrics
+    volumes:
+      - ./node/db/:/node/db
+      - ./node/ipc/:/node/ipc
+      - ./node/logs/:/node/logs
+      - ./node/pool-keys:/node/pool-keys
+      - ./node/data:/node/data
+
+  node_exporter: # Listening by default on port 9100
+    image: quay.io/prometheus/node-exporter:latest
+    container_name: node_exporter
+    ports:
+      - 9104:9100
+    command:
+      - '--path.rootfs=/host'
+    pid: host
+    restart: unless-stopped
+    volumes:
+      - '/:/host:ro,rslave'
+    depends_on:
+      - cardano-node-sanchonet-bp
