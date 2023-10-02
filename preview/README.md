@@ -263,11 +263,11 @@ cardano-cli stake-pool metadata-hash --pool-metadata-file ${DATA}/pool_Metadata.
 ### Air-gapped node
 ### Set environment variables
 ```
-PLEDGE=100000000000
+PLEDGE=<enter-lovelace-pledge>
 COST=340000000
 MARGIN=0.019
-RELAY=194.163.164.5
-PORT=6000
+RELAY=<enter-ip-address>
+PORT=6002
 ```
 ### Create pool registration
 ```
