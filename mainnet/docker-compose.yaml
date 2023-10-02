@@ -1,9 +1,9 @@
 services:
 
-  cardano-node-bp:
+  cardano-node-mainnet-bp:
     build: .
-    image: cardano-node-bp
-    container_name: cardano-node-bp
+    image: cardano-node-mainnet-bp
+    container_name: cardano-node-mainnet-bp
     ports:
       - 6000:6000 # Cardano node relay port
       - 12798:12798 # Cardano node metrics
@@ -14,9 +14,9 @@ services:
       - ./node/pool-keys:/node/pool-keys
       - ./node/data:/node/data
 
-  node_exporter: # Listening by default on port 9100
+  node-exporter-mainnet: # Listening by default on port 9100
     image: quay.io/prometheus/node-exporter:latest
-    container_name: node_exporter
+    container_name: node-exporter-mainnet
     ports:
       - 9100:9100
     command:
@@ -26,4 +26,4 @@ services:
     volumes:
       - '/:/host:ro,rslave'
     depends_on:
-      - cardano-node-bp
+      - cardano-node-mainnet-bp
