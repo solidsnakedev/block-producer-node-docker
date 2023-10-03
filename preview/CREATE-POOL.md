@@ -14,17 +14,47 @@ This command launches the Cardano node in detached mode.
 
 **It will take some time for the node to sync with the network, and it must reach a synchronization level of 100% before proceeding to the next steps.**
 
+
 You can check the synchronization status with the following command:
-```
-docker exec -it cardano-node-preview-bp cardano-cli query tip --testnet-magic 2
-```
+
+- For `Mainnet`
+
+    ```
+    docker exec -it cardano-node-bp-mainnet cardano-cli query tip --mainnet
+    ```
+- For `Preprod`
+    ```
+    docker exec -it cardano-node-bp-preprod cardano-cli query tip --testnet-magic 1
+    ```
+- For `Preview`
+    ```
+    docker exec -it cardano-node-bp-preview cardano-cli query tip ${NETWORK}
+    ```
+- For `Sanchonet`
+    ```
+    docker exec -it cardano-node-bp-sanchonet cardano-cli query tip --testnet-magic 4
+    ```
 
 ## Step 2: Accessing the Cardano Node
 Once the Cardano node is fully synchronized, you can access it using the following command:
 
-```
-docker exec -it cardano-node-preview-bp bash
-```
+- For `Mainnet`
+
+    ```
+    docker exec -it cardano-node-bp-mainnet bash
+    ```
+- For `Preprod`
+    ```
+    docker exec -it cardano-node-bp-preprod bash
+    ```
+- For `Preview`
+    ```
+    docker exec -it cardano-node-bp-preview bash
+    ```
+- For `Sanchonet`
+    ```
+    docker exec -it cardano-node-bp-sanchonet bash
+    ```
 
 ### Set node PATH variables
 ```
@@ -33,6 +63,24 @@ POOL_KEYS=${NODE_HOME}/pool-keys
 DATA=${NODE_HOME}/data
 CONFIGURATION=${NODE_HOME}/configuration
 ```
+
+## Set `cardano-cli` Network
+1. For `Mainnet`
+    ```
+    NETWORK="--mainnet"
+    ```
+2. For `Preprod`
+    ```
+    NETWORK="--testnet-magic 1"
+    ```
+3. For `Preview`
+    ```
+    NETWORK="${NETWORK}"
+    ```
+4. For `Sanchonet`
+    ```
+    NETWORK="--testnet-magic 4"
+    ```
 
 ## Step 3: Generating keys and certificates
 When generating keys and certificates for your Cardano stake pool, it's crucial to prioritize security. 
@@ -111,7 +159,7 @@ cardano-cli stake-address key-gen \
 cardano-cli stake-address build  \
     --stake-verification-key-file ${POOL_KEYS}/stake.vkey \
     --out-file ${POOL_KEYS}/stake.addr \
-    --testnet-magic 2
+    ${NETWORK}
 ```
 
 ### Generate -> `payment address`
@@ -120,7 +168,7 @@ cardano-cli address build \
     --payment-verification-key-file ${POOL_KEYS}/payment.vkey \
     --stake-verification-key-file ${POOL_KEYS}/stake.vkey \
     --out-file ${POOL_KEYS}/payment.addr \
-    --testnet-magic 2
+    ${NETWORK}
 ```
 
 ### Generate -> `stake certificate`
@@ -140,21 +188,21 @@ cat ${POOL_KEYS}/payment.addr
 ```
 cardano-cli query utxo \
     --address $(cat ${POOL_KEYS}/payment.addr) \
-    --testnet-magic 2
+    ${NETWORK}
 ```
 
 
 ## Step 5: Registering Stake Address
 
 ```
-currentSlot=$(cardano-cli query tip --testnet-magic 2 | jq -r '.slot')
+currentSlot=$(cardano-cli query tip ${NETWORK} | jq -r '.slot')
 echo Current Slot: $currentSlot
 ```
 
 ```
 cardano-cli query utxo \
     --address $(cat ${POOL_KEYS}/payment.addr) \
-    --testnet-magic 2 > ${DATA}/fullUtxo.out
+    ${NETWORK} > ${DATA}/fullUtxo.out
 
 tail -n +3 ${DATA}/fullUtxo.out | sort -k3 -nr > ${DATA}/balance.out
 
@@ -182,7 +230,7 @@ echo Number of UTXOs: ${txcnt}
 
 ```
 cardano-cli query protocol-parameters \
-  --testnet-magic 2 \
+  ${NETWORK} \
   --out-file ${DATA}/protocol.json
 ```
 
@@ -205,7 +253,7 @@ fee=$(cardano-cli transaction calculate-min-fee \
     --tx-body-file ${DATA}/tx.tmp \
     --tx-in-count ${txcnt} \
     --tx-out-count 1 \
-    --testnet-magic 2 \
+    ${NETWORK} \
     --witness-count 2 \
     --byron-witness-count 0 \
     --protocol-params-file ${DATA}/protocol.json | awk '{ print $1 }')
@@ -239,7 +287,7 @@ cardano-cli transaction sign \
     --tx-body-file ${DATA}/tx.raw \
     --signing-key-file ${POOL_KEYS}/payment.skey \
     --signing-key-file ${POOL_KEYS}/stake.skey \
-    --testnet-magic 2 \
+    ${NETWORK} \
     --out-file ${DATA}/tx.signed
 ```
 
@@ -248,7 +296,7 @@ cardano-cli transaction sign \
 ```
 cardano-cli transaction submit \
     --tx-file ${DATA}/tx.signed \
-    --testnet-magic 2
+    ${NETWORK}
 ```
 
 ## Step 6: Registering Stake Pool
@@ -294,7 +342,7 @@ cardano-cli stake-pool registration-certificate \
 --pool-margin ${MARGIN} \
 --pool-reward-account-verification-key-file ${POOL_KEYS}/stake.vkey \
 --pool-owner-stake-verification-key-file ${POOL_KEYS}/stake.vkey \
---testnet-magic 2 \
+${NETWORK} \
 --pool-relay-ipv4 ${RELAY} \
 --pool-relay-port ${PORT} \
 --metadata-url ${URL_METADATA} \
@@ -312,7 +360,7 @@ cardano-cli stake-address delegation-certificate \
 
 ### Find the tip of the blockchain
 ```
-currentSlot=$(cardano-cli query tip --testnet-magic 2 | jq -r '.slot')
+currentSlot=$(cardano-cli query tip ${NETWORK} | jq -r '.slot')
 echo Current Slot: $currentSlot
 ```
 
@@ -320,7 +368,7 @@ echo Current Slot: $currentSlot
 ```
 cardano-cli query utxo \
     --address $(cat ${POOL_KEYS}/payment.addr) \
-    --testnet-magic 2 > ${DATA}/fullUtxo.out
+    ${NETWORK} > ${DATA}/fullUtxo.out
 
 tail -n +3 ${DATA}/fullUtxo.out | sort -k3 -nr > ${DATA}/balance.out
 
@@ -349,7 +397,7 @@ echo Number of UTXOs: ${txcnt}
 ### Get protocol parameters
 ```
 cardano-cli query protocol-parameters \
-  --testnet-magic 2 \
+  ${NETWORK} \
   --out-file ${DATA}/protocol.json
 ```
 
@@ -378,7 +426,7 @@ fee=$(cardano-cli transaction calculate-min-fee \
     --tx-body-file ${DATA}/tx.tmp \
     --tx-in-count ${txcnt} \
     --tx-out-count 1 \
-    --testnet-magic 2 \
+    ${NETWORK} \
     --witness-count 3 \
     --byron-witness-count 0 \
     --protocol-params-file ${DATA}/protocol.json | awk '{ print $1 }')
@@ -419,7 +467,7 @@ cardano-cli transaction sign \
     --signing-key-file ${POOL_KEYS}/payment.skey \
     --signing-key-file ${POOL_KEYS}/stake.skey \
     --signing-key-file ${POOL_KEYS}/node.skey \
-    --testnet-magic 2 \
+    ${NETWORK} \
     --out-file ${DATA}/tx.signed
 ```
 
@@ -430,5 +478,5 @@ cardano-cli transaction sign \
 ```
 cardano-cli transaction submit \
     --tx-file ${DATA}/tx.signed \
-    --testnet-magic 2
+    ${NETWORK}
 ```
