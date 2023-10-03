@@ -14,39 +14,23 @@ This command launches the Cardano node in detached mode.
 
 **It will take some time for the node to sync with the network, and it must reach a synchronization level of 100% before proceeding to the next steps.**
 
+
 You can check the synchronization status with the following command:
 
-- For `Mainnet`
-
+- For `Sanchonet`
     ```
-    docker exec -it cardano-node-bp-mainnet cardano-cli query tip --mainnet
-    ```
-- For `Preprod`
-    ```
-    docker exec -it cardano-node-bp-preprod cardano-cli query tip --testnet-magic 1
-    ```
-- For `Preview`
-    ```
-    docker exec -it cardano-node-bp-preview cardano-cli query tip ${NETWORK}
+    docker exec -it cardano-node-bp-sanchonet cardano-cli query tip --testnet-magic 4
     ```
 
 ## Step 2: Accessing the Cardano Node
 Once the Cardano node is fully synchronized, you can access it using the following command:
 
-- For `Mainnet`
+- For `Sanchonet`
     ```
-    docker exec -it cardano-node-bp-mainnet bash
-    ```
-- For `Preprod`
-    ```
-    docker exec -it cardano-node-bp-preprod bash
-    ```
-- For `Preview`
-    ```
-    docker exec -it cardano-node-bp-preview bash
+    docker exec -it cardano-node-bp-sanchonet bash
     ```
 
-### Set node PATH variables
+## Set node PATH variables
 ```
 NODE_HOME=/node
 POOL_KEYS=${NODE_HOME}/pool-keys
@@ -55,17 +39,9 @@ CONFIGURATION=${NODE_HOME}/configuration
 ```
 
 ## Set `cardano-cli` Network
-1. For `Mainnet`
+- For `Sanchonet`
     ```
-    NETWORK="--mainnet"
-    ```
-2. For `Preprod`
-    ```
-    NETWORK="--testnet-magic 1"
-    ```
-3. For `Preview`
-    ```
-    NETWORK="${NETWORK}"
+    NETWORK="--testnet-magic 4"
     ```
 
 ## Step 3: Generating keys and certificates
@@ -94,15 +70,15 @@ cardano-cli node key-gen-VRF \
     --signing-key-file ${POOL_KEYS}/vrf.skey
 ```
 
-### Generate -> `node keys`
+### Generate -> `node keys` YES
 ```
-cardano-cli node key-gen \
+cardano-cli conway node key-gen \
     --cold-verification-key-file ${POOL_KEYS}/node.vkey \
     --cold-signing-key-file ${POOL_KEYS}/node.skey \
     --operational-certificate-issue-counter ${POOL_KEYS}/node.counter
 ```
 
-### Generate -> `node certificate` 
+### Generate -> `node certificate`  YES
 ```
 slotsPerKESPeriod=$(cat ${CONFIGURATION}/shelley-genesis.json | jq -r '.slotsPerKESPeriod')
 echo slotsPerKESPeriod: ${slotsPerKESPeriod}
@@ -119,33 +95,25 @@ startKesPeriod=${kesPeriod}
 echo startKesPeriod: ${startKesPeriod}
 ```
 ```
-cardano-cli node issue-op-cert \
+cardano-cli conway node issue-op-cert \
     --kes-verification-key-file ${POOL_KEYS}/kes.vkey \
     --cold-signing-key-file ${POOL_KEYS}/node.skey \
     --operational-certificate-issue-counter ${POOL_KEYS}/node.counter \
     --kes-period ${startKesPeriod} \
     --out-file ${POOL_KEYS}/node.cert
 ```
-### Generate -> `payment keys`
+### Generate -> `payment keys` YES
 ```
 cardano-cli address key-gen \
     --verification-key-file ${POOL_KEYS}/payment.vkey \
     --signing-key-file ${POOL_KEYS}/payment.skey
 ```
 
-### Generate -> `stake keys`
+### Generate -> `stake keys` YES
 ```
 cardano-cli stake-address key-gen \
     --verification-key-file ${POOL_KEYS}/stake.vkey \
     --signing-key-file ${POOL_KEYS}/stake.skey
-```
-
-### Generate -> `stake address`
-```
-cardano-cli stake-address build  \
-    --stake-verification-key-file ${POOL_KEYS}/stake.vkey \
-    --out-file ${POOL_KEYS}/stake.addr \
-    ${NETWORK}
 ```
 
 ### Generate -> `payment address`
@@ -157,17 +125,26 @@ cardano-cli address build \
     ${NETWORK}
 ```
 
-### Generate -> `stake certificate`
+### Generate -> `stake certificate` YES
 ```
-cardano-cli stake-address registration-certificate \
+cardano-cli conway stake-address registration-certificate \
     --stake-verification-key-file ${POOL_KEYS}/stake.vkey \
+    --key-reg-deposit-amt 2000000 \
     --out-file ${POOL_KEYS}/stake.cert
+```
+
+### Generate -> `pool id`
+```
+cardano-cli stake-pool id \
+    --cold-verification-key-file ${POOL_KEYS}/node.vkey \
+    --output-format bech32 \
+    --out-file ${POOL_KEYS}/pool.id
 ```
 
 ## Step 4: Funding wallet
 Send at least 1000 ADA to your pool payment address
 ```
-cat ${POOL_KEYS}/payment.addr
+echo $(cat ${POOL_KEYS}/payment.addr)
 ```
 
 ### Check wallet funds
@@ -181,87 +158,12 @@ cardano-cli query utxo \
 ## Step 5: Registering Stake Address
 
 ```
-currentSlot=$(cardano-cli query tip ${NETWORK} | jq -r '.slot')
-echo Current Slot: $currentSlot
-```
-
-```
-cardano-cli query utxo \
-    --address $(cat ${POOL_KEYS}/payment.addr) \
-    ${NETWORK} > ${DATA}/fullUtxo.out
-
-tail -n +3 ${DATA}/fullUtxo.out | sort -k3 -nr > ${DATA}/balance.out
-
-cat ${DATA}/balance.out
-
-tx_in=""
-total_balance=0
-while read -r utxo; do
-    type=$(awk '{ print $6 }' <<< "${utxo}")
-    if [[ ${type} == 'TxOutDatumNone' ]]
-    then
-        in_addr=$(awk '{ print $1 }' <<< "${utxo}")
-        idx=$(awk '{ print $2 }' <<< "${utxo}")
-        utxo_balance=$(awk '{ print $3 }' <<< "${utxo}")
-        total_balance=$((${total_balance}+${utxo_balance}))
-        echo TxHash: ${in_addr}#${idx}
-        echo ADA: ${utxo_balance}
-        tx_in="${tx_in} --tx-in ${in_addr}#${idx}"
-    fi
-done < ${DATA}/balance.out
-txcnt=$(cat ${DATA}/balance.out | wc -l)
-echo Total available ADA balance: ${total_balance}
-echo Number of UTXOs: ${txcnt}
-```
-
-```
-cardano-cli query protocol-parameters \
-  ${NETWORK} \
-  --out-file ${DATA}/protocol.json
-```
-
-```
-stakeAddressDeposit=$(cat ${DATA}/protocol.json | jq -r '.stakeAddressDeposit')
-echo stakeAddressDeposit : $stakeAddressDeposit
-```
-```
-cardano-cli transaction build-raw \
-    ${tx_in} \
-    --tx-out $(cat ${POOL_KEYS}/payment.addr)+0 \
-    --invalid-hereafter $(( ${currentSlot} + 10000)) \
-    --fee 0 \
-    --out-file ${DATA}/tx.tmp \
-    --certificate ${POOL_KEYS}/stake.cert
-```
-
-```
-fee=$(cardano-cli transaction calculate-min-fee \
-    --tx-body-file ${DATA}/tx.tmp \
-    --tx-in-count ${txcnt} \
-    --tx-out-count 1 \
+cardano-cli transaction build \
+    --conway-era \
     ${NETWORK} \
-    --witness-count 2 \
-    --byron-witness-count 0 \
-    --protocol-params-file ${DATA}/protocol.json | awk '{ print $1 }')
-echo fee: $fee
-```
-
-```
-fee=$((fee + 100000))
-echo fee: $fee
-```
-
-```
-txOut=$((${total_balance}-${stakeAddressDeposit}-${fee}))
-echo Change Output: ${txOut}
-```
-
-```
-cardano-cli transaction build-raw \
-    ${tx_in} \
-    --tx-out $(cat ${POOL_KEYS}/payment.addr)+${txOut} \
-    --invalid-hereafter $(( ${currentSlot} + 10000)) \
-    --fee ${fee} \
+    --witness-override 2 \
+    --tx-in $(cardano-cli query utxo --address $(cat ${POOL_KEYS}/payment.addr) ${NETWORK} --out-file  /dev/stdout | jq -r 'keys[0]') \
+    --change-address $(cat ${POOL_KEYS}/payment.addr) \
     --certificate-file ${POOL_KEYS}/stake.cert \
     --out-file ${DATA}/tx.raw
 ```
@@ -315,7 +217,7 @@ PLEDGE=<enter-lovelace-pledge>
 COST=340000000
 MARGIN=0.019
 RELAY=<enter-ip-address>
-PORT=6002
+PORT=6004
 ```
 
 ### Create pool registration (1 relay)
@@ -344,100 +246,13 @@ cardano-cli stake-address delegation-certificate \
 --out-file ${DATA}/delegation.cert
 ```
 
-### Find the tip of the blockchain
-```
-currentSlot=$(cardano-cli query tip ${NETWORK} | jq -r '.slot')
-echo Current Slot: $currentSlot
-```
-
-### Find your balance and UTXOs.
-```
-cardano-cli query utxo \
-    --address $(cat ${POOL_KEYS}/payment.addr) \
-    ${NETWORK} > ${DATA}/fullUtxo.out
-
-tail -n +3 ${DATA}/fullUtxo.out | sort -k3 -nr > ${DATA}/balance.out
-
-cat ${DATA}/balance.out
-
-tx_in=""
-total_balance=0
-while read -r utxo; do
-    type=$(awk '{ print $6 }' <<< "${utxo}")
-    if [[ ${type} == 'TxOutDatumNone' ]]
-    then
-        in_addr=$(awk '{ print $1 }' <<< "${utxo}")
-        idx=$(awk '{ print $2 }' <<< "${utxo}")
-        utxo_balance=$(awk '{ print $3 }' <<< "${utxo}")
-        total_balance=$((${total_balance}+${utxo_balance}))
-        echo TxHash: ${in_addr}#${idx}
-        echo ADA: ${utxo_balance}
-        tx_in="${tx_in} --tx-in ${in_addr}#${idx}"
-    fi
-done < ${DATA}/balance.out
-txcnt=$(cat ${DATA}/balance.out | wc -l)
-echo Total available ADA balance: ${total_balance}
-echo Number of UTXOs: ${txcnt}
-```
-
-### Get protocol parameters
-```
-cardano-cli query protocol-parameters \
-  ${NETWORK} \
-  --out-file ${DATA}/protocol.json
-```
-
-```
-stakePoolDeposit=$(cat ${DATA}/protocol.json | jq -r '.stakePoolDeposit')
-echo stakePoolDeposit: $stakePoolDeposit
-```
-
-### Draft the transaction
-```
-cardano-cli transaction build-raw \
-    ${tx_in} \
-    --tx-out $(cat ${POOL_KEYS}/payment.addr)+$(( ${total_balance} - ${stakePoolDeposit}))  \
-    --invalid-hereafter $(( ${currentSlot} + 10000)) \
-    --fee 0 \
-    --certificate-file ${DATA}/pool-registration.cert \
-    --certificate-file ${DATA}/delegation.cert \
-    --out-file ${DATA}/tx.tmp
-```
-
-
-
-### Calculate the minimum fee:
-```
-fee=$(cardano-cli transaction calculate-min-fee \
-    --tx-body-file ${DATA}/tx.tmp \
-    --tx-in-count ${txcnt} \
-    --tx-out-count 1 \
-    ${NETWORK} \
-    --witness-count 3 \
-    --byron-witness-count 0 \
-    --protocol-params-file ${DATA}/protocol.json | awk '{ print $1 }')
-echo fee: $fee
-```
-### Add extra fee
-
-```
-fee=$((fee + 100000))
-echo fee: $fee
-```
-
-### Calculate your change output.
-```
-txOut=$((${total_balance}-${stakePoolDeposit}-${fee}))
-echo txOut: ${txOut}
-```
-
 ### Build the transaction. 
 ```
-cardano-cli transaction build-raw \
-    ${tx_in} \
-    --tx-out $(cat ${POOL_KEYS}/payment.addr)+${txOut} \
-    --invalid-hereafter $(( ${currentSlot} + 10000)) \
-    --fee ${fee} \
+cardano-cli conway transaction build \
+    ${NETWORK} \
+    --witness-override 3 \
+    --tx-in $(cardano-cli query utxo --address $(cat ${POOL_KEYS}/payment.addr) ${NETWORK} --out-file  /dev/stdout | jq -r 'keys[0]') \
+    --change-address $(cat ${POOL_KEYS}/payment.addr) \
     --certificate-file ${DATA}/pool-registration.cert \
     --certificate-file ${DATA}/delegation.cert \
     --out-file ${DATA}/tx.raw
@@ -465,4 +280,12 @@ cardano-cli transaction sign \
 cardano-cli transaction submit \
     --tx-file ${DATA}/tx.signed \
     ${NETWORK}
+```
+
+# Request stake delegation from faucet
+
+https://sancho.network/faucet/
+
+```
+echo $(cat ${POOL_KEYS}/pool.id)
 ```
