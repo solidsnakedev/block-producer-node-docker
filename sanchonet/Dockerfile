@@ -1,3 +1,4 @@
+# syntax=docker/dockerfile:1
 FROM ubuntu:latest
 
 # Install Cardano dependencies
@@ -6,12 +7,20 @@ RUN apt-get update -y && \
 
 RUN mkdir src
 
-RUN TAG=$(curl -s https://api.github.com/repos/input-output-hk/cardano-node/releases/latest | jq -r .tag_name) && \
+ARG TAG
+
+# TODO: find a way to get the download link by release but in linux
+RUN <<EOT
+    [ -z ${TAG} ] \
+    && URL=$(curl -s https://api.github.com/repos/input-output-hk/cardano-node/releases/latest | jq -r '.assets[] | select(.name | contains("linux")) | .browser_download_url') \
+    || URL=$( curl -s https://api.github.com/repos/input-output-hk/cardano-node/releases/tags/${TAG} | jq -r '.assets[] | select(.name | contains("linux")) | .browser_download_url')
+
     cd src && \
-    wget -cO - https://github.com/input-output-hk/cardano-node/releases/download/${TAG}/cardano-node-${TAG}-linux.tar.gz > cardano-node.tar.gz && \
-    tar -xvf cardano-node.tar.gz && \
-    mv cardano-node /usr/local/bin && \
+    wget -cO - ${URL} > cardano-node.tar.gz && \
+    tar -xvf cardano-node.tar.gz &&
+    mv cardano-node /usr/local/bin &&
     mv cardano-cli /usr/local/bin
+EOT
 
 # Install libsodium
 RUN cd src && \
