@@ -9,7 +9,6 @@ RUN mkdir src
 
 ARG TAG
 
-# TODO: find a way to get the download link by release but in linux
 RUN <<EOT
     [ -z ${TAG} ] \
     && URL=$(curl -s https://api.github.com/repos/input-output-hk/cardano-node/releases/latest | jq -r '.assets[] | select(.name | contains("linux")) | .browser_download_url') \
@@ -51,11 +50,11 @@ RUN rm -r /src
 
 # Get latest config files
 RUN wget -P /node/configuration \
-    https://raw.githubusercontent.com/input-output-hk/cardano-world/master/docs/environments/sanchonet/byron-genesis.json \
-    https://raw.githubusercontent.com/input-output-hk/cardano-world/master/docs/environments/sanchonet/shelley-genesis.json \
-    https://raw.githubusercontent.com/input-output-hk/cardano-world/master/docs/environments/sanchonet/alonzo-genesis.json \
-    https://raw.githubusercontent.com/input-output-hk/cardano-world/master/docs/environments/sanchonet/conway-genesis.json \
-    https://raw.githubusercontent.com/input-output-hk/cardano-world/master/docs/environments/sanchonet/config.json
+    https://book.world.dev.cardano.org/environments/sanchonet/byron-genesis.json \
+    https://book.world.dev.cardano.org/environments/sanchonet/shelley-genesis.json \
+    https://book.world.dev.cardano.org/environments/sanchonet/alonzo-genesis.json \
+    https://book.world.dev.cardano.org/environments/sanchonet/conway-genesis.json \
+    https://book.world.dev.cardano.org/environments/sanchonet/config.json
 
 # Change config to save them in /node/log/node.log file instead of stdout
 RUN sed -i 's/StdoutSK/FileSK/' /node/configuration/config.json && \
