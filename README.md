@@ -1,112 +1,67 @@
-# Block producer node instructions
 
-## Before building
+# Build Cardano Node Docker Image
+This guide will help you build a Cardano node Docker image for your network setup. Before proceeding, ensure you have the necessary information:
 
-### Add new user to remote server
+- `<relay-ip-address>` : Replace this with the IP Address of the relay node.
 
-```
-useradd -m -s /bin/bash cardano
-```
-```
-passwd cardano
-```
-```
-usermod -aG sudo cardano
-```
+- `<relay-port>`: Replace this with the Port number of the relay node.
 
+## Navigate to the Network Directory
+Choose the appropriate directory (mainnet, preprod, or preview) based on your network configuration and navigate to it using the cd command
 
-### Copy ed25519 public keys from local to remote server 
+## Option 1: Build Node with 1 Relay
+To build a Cardano node with one relay, use the following command:
 
 ```
-ssh-copy-id -i $HOME/.ssh/<keyname>.pub cardano@server.public.ip.address
-
-```
-### Update sshd_config file
-
-```
-sed -i '/ChallengeResponseAuthentication/d' /etc/ssh/sshd_config
-sed -i '/PasswordAuthentication/d' /etc/ssh/sshd_config
-sed -i '/PermitRootLogin/d' /etc/ssh/sshd_config
-sed -i '/PermitEmptyPasswords/d' /etc/ssh/sshd_config
-
-echo "ChallengeResponseAuthentication no" >> /etc/ssh/sshd_config
-echo "PasswordAuthentication no" >> /etc/ssh/sshd_config
-echo "PermitRootLogin prohibit-password" >> /etc/ssh/sshd_config
-echo "PermitEmptyPasswords no" >> /etc/ssh/sshd_config
-```
-
-### Validate sshd config
-```
-sudo sshd -t
-```
-
-### Restart sshd service
-```
-sudo systemctl restart sshd
-```
-
-Remember to save the pool keys in ./node/pool-keys
-
-## Build cardano node docker image
-
-* replace `<relay-ip-address>` with the IP Address of the relay node
-* replace `<relay-port>` with the Port number of the relay node
-
-### 1 Relay
-```
-docker compose -f ./mainnet/docker-compose.yaml build \
+docker-compose build \
     --build-arg RELAY1_IP=<relay-ip-address> \
     --build-arg RELAY1_PORT=<relay-port>
 ```
- 
-### 2 Relays
+This command builds a Docker image for a Cardano node with a single relay.
+
+## Option 2: Build Node with 2 Relays
+To build a Cardano node with two relays, use the following command:
+
 ```
-docker compose -f ./mainnet/docker-compose.yaml build \
+docker-compose build \
     --build-arg RELAY1_IP=<relay-ip-address> \
     --build-arg RELAY1_PORT=<relay-port> \
     --build-arg RELAY2_IP=<relay-ip-address> \
     --build-arg RELAY2_PORT=<relay-port>
 ```
 
-## Run container
+## Option 3: Build Node/Relay (Node and Relay Combined)
+If you want to build a Cardano node and relay together, use the following command:
+
+```
+docker-compose build
+```
+This command builds a block producer with direct connection to other nodes in the network
+
+Once the build process is complete, you can proceed with configuring and running your Cardano node according to your specific requirements.
+
+## Running the node
+Bootstrapping the Cardano node in STAND-ALONE mode
 ```
 docker compose up -d
 ```
+This command launches the Cardano node in detached mode.
 
+**It will take some time for the node to sync with the network, and it must reach a synchronization level of 100% before proceeding to the next steps.**
 
-## Upgrade Node
+You can check the synchronization status with the following command:
+```
+docker exec -it cardano-node-mainnet-bp cardano-cli query tip --mainnet
+```
+
+# Upgrade Node
 
 ```
 docker compose down
 ```
 ```
-docker compose -f ./mainnet/docker-compose.yaml build \
+docker compose build \
     --no-cache \
     --build-arg RELAY1_IP=<relay-ip-address> \
     --build-arg RELAY1_PORT=<relay-port>
-```
-
-## Mithril Client
-
-# Preprod settings
-
-```
-export MITHRIL_IMAGE_ID=latest
-export NETWORK=preprod
-export AGGREGATOR_ENDPOINT=https://aggregator.release-preprod.api.mithril.network/aggregator
-export GENESIS_VERIFICATION_KEY=$(wget -q -O - https://raw.githubusercontent.com/input-output-hk/mithril/main/mithril-infra/configuration/release-preprod/genesis.vkey)
-export SNAPSHOT_DIGEST=latest
-```
-
-# Preview settings
-```
-export MITHRIL_IMAGE_ID=latest
-export NETWORK=preview
-export AGGREGATOR_ENDPOINT=https://aggregator.pre-release-preview.api.mithril.network/aggregator
-export GENESIS_VERIFICATION_KEY=$(wget -q -O - https://raw.githubusercontent.com/input-output-hk/mithril/main/mithril-infra/configuration/pre-release-preview/genesis.vkey)
-export SNAPSHOT_DIGEST=latest
-```
-
-```
-./mithril-client.sh --version
 ```

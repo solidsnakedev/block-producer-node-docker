@@ -1,27 +1,49 @@
 
 # Create Stake Pool Keys and Certificates
+This section outlines the steps to create stake pool keys and certificates while bootstrapping the Cardano node in STAND-ALONE mode.
 
-## Bootstrap cardano node as STAND-ALONE mode
+## Prerequisites
+Ensure that the node/pool-keys directory is empty before proceeding with the following steps.
 
-`node/pool-keys` must be empty
+## Step 1: Bootstrapping the Cardano Node
 
 ```
 docker compose up -d
 ```
-cardano node must be sync at 100%
+This command launches the Cardano node in detached mode.
 
+**It will take some time for the node to sync with the network, and it must reach a synchronization level of 100% before proceeding to the next steps.**
+
+You can check the synchronization status with the following command:
+```
+docker exec -it cardano-node-preview-bp cardano-cli query tip --testnet-magic 2
+```
+
+## Step 2: Accessing the Cardano Node
+Once the Cardano node is fully synchronized, you can access it using the following command:
 
 ```
 docker exec -it cardano-node-preview-bp bash
 ```
 
-### Set environment variables
+### Set node PATH variables
 ```
 NODE_HOME=/node
 POOL_KEYS=${NODE_HOME}/pool-keys
 DATA=${NODE_HOME}/data
 CONFIGURATION=${NODE_HOME}/configuration
 ```
+
+## Step 3: Generating keys and certificates
+When generating keys and certificates for your Cardano stake pool, it's crucial to prioritize security. 
+
+You have two options for the environment in which you generate these keys: 
+1. Using an air-gapped computer without internet access
+2. Taking high security measures on your current machine.
+
+**Whichever option you choose, make sure these keys are stored securely in a safe location.**
+
+**The most critical keys are the `*.skey` files, as they are used for signing transactions in your air-gapped node.**
 
 ### Generate -> `kes keys`
 
@@ -45,13 +67,15 @@ cardano-cli node key-gen \
     --cold-signing-key-file ${POOL_KEYS}/node.skey \
     --operational-certificate-issue-counter ${POOL_KEYS}/node.counter
 ```
+
+### Generate -> `node certificate` 
 ```
 slotsPerKESPeriod=$(cat ${CONFIGURATION}/shelley-genesis.json | jq -r '.slotsPerKESPeriod')
 echo slotsPerKESPeriod: ${slotsPerKESPeriod}
 ```
 
 ```
-slotNo=$(cardano-cli query tip --testnet-magic 2 | jq -r '.slot')
+slotNo=$(cardano-cli query tip ${NETWORK} | jq -r '.slot')
 ```
 
 ```
@@ -60,7 +84,6 @@ echo kesPeriod: ${kesPeriod}
 startKesPeriod=${kesPeriod}
 echo startKesPeriod: ${startKesPeriod}
 ```
-### Generate -> `node certificate` 
 ```
 cardano-cli node issue-op-cert \
     --kes-verification-key-file ${POOL_KEYS}/kes.vkey \
@@ -107,27 +130,21 @@ cardano-cli stake-address registration-certificate \
     --out-file ${POOL_KEYS}/stake.cert
 ```
 
-## Fund wallet
+## Step 4: Funding wallet
+Send at least 1000 ADA to your pool payment address
 ```
 cat ${POOL_KEYS}/payment.addr
 ```
 
-## Check wallet funds
+### Check wallet funds
 ```
 cardano-cli query utxo \
     --address $(cat ${POOL_KEYS}/payment.addr) \
     --testnet-magic 2
 ```
 
-# Run Stake Pool
 
-* Backup all the keys from `node/pool-keys` except for `kes.skey` `vrf.skey` `node.cert`
-
-```
-docker compose up -d
-```
-
-# Register Stake Address
+## Step 5: Registering Stake Address
 
 ```
 currentSlot=$(cardano-cli query tip --testnet-magic 2 | jq -r '.slot')
@@ -234,8 +251,8 @@ cardano-cli transaction submit \
     --testnet-magic 2
 ```
 
-# Register Stake Pool
-### Set environment variables
+## Step 6: Registering Stake Pool
+### - Set environment variables
 
 ```
 NODE_HOME=/node
@@ -244,7 +261,7 @@ DATA=${NODE_HOME}/data
 CONFIGURATION=${NODE_HOME}/configuration
 ```
 
-### Download `pool metadata`
+### - Download `pool metadata`
 ```
 URL_METADATA=https://solidsnakedev.github.io/poolMetadata.json
 ```
@@ -253,14 +270,11 @@ URL_METADATA=https://solidsnakedev.github.io/poolMetadata.json
 wget ${URL_METADATA} -O ${DATA}/pool_Metadata.json
 ```
 
-### Calculate the hash of your metadata file
+### - Calculate the hash of your metadata file
 ```
 cardano-cli stake-pool metadata-hash --pool-metadata-file ${DATA}/pool_Metadata.json > ${DATA}/pool_MetadataHash.txt
 ```
 
-***
-
-### Air-gapped node
 ### Set environment variables
 ```
 PLEDGE=<enter-lovelace-pledge>
@@ -269,7 +283,8 @@ MARGIN=0.019
 RELAY=<enter-ip-address>
 PORT=6002
 ```
-### Create pool registration
+
+### Create pool registration (1 relay)
 ```
 cardano-cli stake-pool registration-certificate \
 --cold-verification-key-file ${POOL_KEYS}/node.vkey \
@@ -294,9 +309,7 @@ cardano-cli stake-address delegation-certificate \
 --cold-verification-key-file ${POOL_KEYS}/node.vkey \
 --out-file ${DATA}/delegation.cert
 ```
-***
 
-## Block producer node
 ### Find the tip of the blockchain
 ```
 currentSlot=$(cardano-cli query tip --testnet-magic 2 | jq -r '.slot')
