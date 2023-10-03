@@ -1,9 +1,9 @@
 services:
 
-  cardano-node-preview-bp:
+  cardano-node-bp-preview:
     build: .
-    image: cardano-node-preview-bp
-    container_name: cardano-node-preview-bp
+    image: cardano-node-bp-preview
+    container_name: cardano-node-bp-preview
     ports:
       - 6002:6002 # Cardano node relay port
       - 12792:12798 # Cardano node metrics
@@ -26,4 +26,4 @@ services:
     volumes:
       - '/:/host:ro,rslave'
     depends_on:
-      - cardano-node-preview-bp
+      - cardano-node-bp-preview

@@ -1,9 +1,9 @@
 services:
 
-  cardano-node-mainnet-bp:
+  cardano-node-bp-mainnet:
     build: .
-    image: cardano-node-mainnet-bp
-    container_name: cardano-node-mainnet-bp
+    image: cardano-node-bp-mainnet
+    container_name: cardano-node-bp-mainnet
     ports:
       - 6000:6000 # Cardano node relay port
       - 12798:12798 # Cardano node metrics
@@ -26,4 +26,4 @@ services:
     volumes:
       - '/:/host:ro,rslave'
     depends_on:
-      - cardano-node-mainnet-bp
+      - cardano-node-bp-mainnet

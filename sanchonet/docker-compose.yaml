@@ -1,9 +1,9 @@
 services:
 
-  cardano-node-sanchonet-bp:
+  cardano-node-bp-sanchonet:
     build: .
-    image: cardano-node-sanchonet-bp
-    container_name: cardano-node-sanchonet-bp
+    image: cardano-node-bp-sanchonet
+    container_name: cardano-node-bp-sanchonet
     ports:
       - 6004:6004 # Cardano node relay port
       - 12794:12798 # Cardano node metrics
@@ -26,4 +26,4 @@ services:
     volumes:
       - '/:/host:ro,rslave'
     depends_on:
-      - cardano-node-sanchonet-bp
+      - cardano-node-bp-sanchonet

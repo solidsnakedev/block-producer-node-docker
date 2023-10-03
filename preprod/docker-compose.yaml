@@ -1,9 +1,9 @@
 services:
 
-  cardano-node-preprod-bp:
+  cardano-node-bp-preprod:
     build: .
-    image: cardano-node-preprod-bp
-    container_name: cardano-node-preprod-bp
+    image: cardano-node-bp-preprod
+    container_name: cardano-node-bp-preprod
     ports:
       - 6001:6001 # Cardano node relay port
       - 12791:12791 # Cardano node metrics
@@ -26,4 +26,4 @@ services:
     volumes:
       - '/:/host:ro,rslave'
     depends_on:
-      - cardano-node-preprod-bp
+      - cardano-node-bp-preprod
