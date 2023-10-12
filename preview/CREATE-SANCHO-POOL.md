@@ -70,7 +70,7 @@ cardano-cli node key-gen-VRF \
     --signing-key-file ${POOL_KEYS}/vrf.skey
 ```
 
-### Generate -> `node keys` YES
+### Generate -> `node keys`
 ```
 cardano-cli conway node key-gen \
     --cold-verification-key-file ${POOL_KEYS}/node.vkey \
@@ -78,7 +78,7 @@ cardano-cli conway node key-gen \
     --operational-certificate-issue-counter ${POOL_KEYS}/node.counter
 ```
 
-### Generate -> `node certificate`  YES
+### Generate -> `node certificate`
 ```
 slotsPerKESPeriod=$(cat ${CONFIGURATION}/shelley-genesis.json | jq -r '.slotsPerKESPeriod')
 echo slotsPerKESPeriod: ${slotsPerKESPeriod}
@@ -102,14 +102,14 @@ cardano-cli conway node issue-op-cert \
     --kes-period ${startKesPeriod} \
     --out-file ${POOL_KEYS}/node.cert
 ```
-### Generate -> `payment keys` YES
+### Generate -> `payment keys`
 ```
 cardano-cli address key-gen \
     --verification-key-file ${POOL_KEYS}/payment.vkey \
     --signing-key-file ${POOL_KEYS}/payment.skey
 ```
 
-### Generate -> `stake keys` YES
+### Generate -> `stake keys`
 ```
 cardano-cli stake-address key-gen \
     --verification-key-file ${POOL_KEYS}/stake.vkey \
@@ -125,7 +125,7 @@ cardano-cli address build \
     ${NETWORK}
 ```
 
-### Generate -> `stake certificate` YES
+### Generate -> `stake certificate`
 ```
 cardano-cli conway stake-address registration-certificate \
     --stake-verification-key-file ${POOL_KEYS}/stake.vkey \
@@ -288,4 +288,11 @@ https://sancho.network/faucet/
 
 ```
 echo $(cat ${POOL_KEYS}/pool.id)
+
+```
+## Query stake delegated 
+```
+cardano-cli query stake-snapshot \
+    ${NETWORK} \
+    --stake-pool-id $(cat ${POOL_KEYS}/pool.id)
 ```

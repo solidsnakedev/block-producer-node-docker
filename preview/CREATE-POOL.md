@@ -27,7 +27,7 @@ You can check the synchronization status with the following command:
     ```
 - For `Preview`
     ```
-    docker exec -it cardano-node-bp-preview cardano-cli query tip ${NETWORK}
+    docker exec -it cardano-node-bp-preview cardano-cli query tip --testnet-magic 2
     ```
 
 ## Step 2: Accessing the Cardano Node
@@ -65,7 +65,7 @@ CONFIGURATION=${NODE_HOME}/configuration
     ```
 3. For `Preview`
     ```
-    NETWORK="${NETWORK}"
+    NETWORK="--testnet-magic 2"
     ```
 
 ## Step 3: Generating keys and certificates
