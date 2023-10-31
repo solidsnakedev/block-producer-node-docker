@@ -115,6 +115,35 @@ RUN \
     else echo " *** Incorrect Setting ***" ; \
     fi
 
+ARG CNCLI_API_KEY 
+ARG CNCLI_POOL_NAME
+ARG CNCLI_POOL_ID
+ARG CNCLI_HOST
+ARG CNCLI_PORT
+
+RUN <<EOT
+    if [ -z $CNCLI* ]; then
+    jq -n \
+        --arg api_key "$CNCLI_API_KEY" \
+        --arg pool_name "$CNCLI_POOL_NAME" \
+        --arg pool_id "$CNCLI_POOL_ID" \
+        --arg host "$CNCLI_HOST" \
+        --arg port "$CNCLI_PORT" \
+        '{
+            api_key: $api_key, 
+            pools: [
+                { 
+                    name: $pool_name,
+                    pool_id: $pool_id,
+                    host : $host,
+                    port: $port,
+                }
+            ]
+        }' \
+        > /node/configuration/cncli-config.json
+    fi
+EOT
+
 # Set node socket evironment for cardano-cli
 ENV CARDANO_NODE_SOCKET_PATH="/node/ipc/node.socket"
 
