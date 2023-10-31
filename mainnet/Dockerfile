@@ -122,7 +122,6 @@ ARG CNCLI_HOST
 ARG CNCLI_PORT
 
 RUN <<EOT
-    if [ -z $CNCLI* ]; then
     jq -n \
         --arg api_key "$CNCLI_API_KEY" \
         --arg pool_name "$CNCLI_POOL_NAME" \
@@ -141,7 +140,6 @@ RUN <<EOT
             ]
         }' \
         > /node/configuration/cncli-config.json
-    fi
 EOT
 
 # Set node socket evironment for cardano-cli
