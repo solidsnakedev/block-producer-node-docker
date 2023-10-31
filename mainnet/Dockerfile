@@ -25,7 +25,8 @@ RUN <<EOT
     URL=$(curl -s https://api.github.com/repos/cardano-community/cncli/releases/latest | jq -r '.assets[] | select(.name | contains("linux")) | .browser_download_url')
     cd src && \
     wget -cO - ${URL} > cncli.tar.gz && \
-    tar xzvf cncli.tar.gz /usr/local/bin
+    tar xzvf cncli.tar.gz && \
+    mv cncli /usr/local/bin
 EOT
 
 # Install libsodium
