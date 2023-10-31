@@ -21,6 +21,13 @@ RUN <<EOT
     mv cardano-cli /usr/local/bin
 EOT
 
+RUN <<EOT
+    URL=$(curl -s https://api.github.com/repos/cardano-community/cncli/releases/latest | jq -r '.assets[] | select(.name | contains("linux")) | .browser_download_url')
+    cd src && \
+    wget -cO - ${URL} > cncli.tar.gz && \
+    tar xzvf cncli.tar.gz /usr/local/bin
+EOT
+
 # Install libsodium
 RUN cd src && \
     git clone https://github.com/input-output-hk/libsodium && \
