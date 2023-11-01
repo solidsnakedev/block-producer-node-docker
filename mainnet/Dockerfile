@@ -148,6 +148,9 @@ ENV POOL_KEYS=${NODE_HOME}/pool-keys
 ENV DATA=${NODE_HOME}/data
 ENV CONFIGURATION=${NODE_HOME}/configuration
 
+# Set network for cardano-cli commands
+ENV NETWORK="--mainnet"
+
 # Set node socket evironment for cardano-cli
 ENV CARDANO_NODE_SOCKET_PATH="/node/ipc/node.socket"
 
