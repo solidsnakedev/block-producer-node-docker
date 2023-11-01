@@ -142,6 +142,12 @@ RUN <<EOT
         > /node/configuration/cncli-config.json
 EOT
 
+# Set path location
+ENV NODE_HOME=/node
+ENV POOL_KEYS=${NODE_HOME}/pool-keys
+ENV DATA=${NODE_HOME}/data
+ENV CONFIGURATION=${NODE_HOME}/configuration
+
 # Set node socket evironment for cardano-cli
 ENV CARDANO_NODE_SOCKET_PATH="/node/ipc/node.socket"
 
