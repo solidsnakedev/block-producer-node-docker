@@ -13,7 +13,7 @@ Choose the appropriate directory (mainnet, preprod, or preview) based on your ne
 To build a Cardano node with one relay, use the following command:
 
 ```
-docker-compose build \
+docker compose build \
     --build-arg RELAY1_IP=<relay-ip-address> \
     --build-arg RELAY1_PORT=<relay-port>
 ```
@@ -23,7 +23,7 @@ This command builds a Docker image for a Cardano node with a single relay.
 To build a Cardano node with two relays, use the following command:
 
 ```
-docker-compose build \
+docker compose build \
     --build-arg RELAY1_IP=<relay-ip-address> \
     --build-arg RELAY1_PORT=<relay-port> \
     --build-arg RELAY2_IP=<relay-ip-address> \
@@ -34,7 +34,7 @@ docker-compose build \
 If you want to build a Cardano node and relay together, use the following command:
 
 ```
-docker-compose build
+docker compose build
 ```
 This command builds a block producer with direct connection to other nodes in the network
 
