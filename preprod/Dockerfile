@@ -50,12 +50,12 @@ RUN rm -r /src
 
 # Get latest config files
 RUN wget -P /node/configuration \
-    https://book.world.dev.cardano.org/environments/preview/byron-genesis.json \
-    https://book.world.dev.cardano.org/environments/preview/shelley-genesis.json \
-    https://book.world.dev.cardano.org/environments/preview/alonzo-genesis.json \
-    https://book.world.dev.cardano.org/environments/preview/conway-genesis.json \
-    https://book.world.dev.cardano.org/environments/preview/config.json \
-    https://book.world.dev.cardano.org/environments/preview/topology.json
+    https://book.world.dev.cardano.org/environments/preprod/byron-genesis.json \
+    https://book.world.dev.cardano.org/environments/preprod/shelley-genesis.json \
+    https://book.world.dev.cardano.org/environments/preprod/alonzo-genesis.json \
+    https://book.world.dev.cardano.org/environments/preprod/conway-genesis.json \
+    https://book.world.dev.cardano.org/environments/preprod/config.json \
+    https://book.world.dev.cardano.org/environments/preprod/topology.json
     
 # Change config to save them in /node/log/node.log file instead of stdout
 RUN sed -i 's/StdoutSK/FileSK/' /node/configuration/config.json && \
