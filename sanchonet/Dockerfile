@@ -115,14 +115,14 @@ RUN \
     "         {\n" \
     "           \"accessPoints\": [\n" \
     "               {\n" \
-    "                 \"address\": \"sanchonet-node.world.dev.cardano.org\",\n" \
-    "                 \"port\": 30004\n" \
+    "                 \"address\": \"sanchonet-node.play.dev.cardano.org/",\n" \
+    "                 \"port\": 3001\n" \
     "               }\n" \
     "             ],\n" \
     "           \"advertise\": false\n" \
     "         }\n" \
     "       ],\n" \
-    "   \"useLedgerAfterSlot\": 8877900\n" \
+    "   \"useLedgerAfterSlot\": 14601600\n" \
     "}\n" \
     > /node/configuration/topology.json ; \
     fi
