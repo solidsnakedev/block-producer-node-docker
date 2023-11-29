@@ -131,7 +131,7 @@ RUN \
 ENV CARDANO_NODE_SOCKET_PATH="/node/ipc/node.socket"
 
 # Set mainnet magic number
-ENV MAGIC_NUMBER=2
+ENV MAGIC_NUMBER=9
 
 # Create keys, ipc, data, scripts, logs folders
 RUN mkdir -p /node/ipc /node/logs /node/pool-keys
