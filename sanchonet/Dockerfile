@@ -54,7 +54,7 @@ RUN wget -P /node/configuration \
     https://book.world.dev.cardano.org/environments/sanchonet/shelley-genesis.json \
     https://book.world.dev.cardano.org/environments/sanchonet/alonzo-genesis.json \
     https://book.world.dev.cardano.org/environments/sanchonet/conway-genesis.json \
-    https://book.world.dev.cardano.org/environments/sanchonet/config.json
+    https://book.play.dev.cardano.org/environments/sanchonet/config.json
 
 # Change config to save them in /node/log/node.log file instead of stdout
 RUN sed -i 's/StdoutSK/FileSK/' /node/configuration/config.json && \
