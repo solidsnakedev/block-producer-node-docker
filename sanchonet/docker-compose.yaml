@@ -13,7 +13,7 @@ services:
       - ./node/logs/:/node/logs
       - ./node/pool-keys:/node/pool-keys
       - ./node/data:/node/data
-
+      
   node-exporter-sanchonet: # Listening by default on port 9100
     image: quay.io/prometheus/node-exporter:latest
     container_name: node-exporter-sanchonet

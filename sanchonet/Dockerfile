@@ -54,7 +54,7 @@ RUN wget -P /node/configuration \
     https://book.world.dev.cardano.org/environments/sanchonet/shelley-genesis.json \
     https://book.world.dev.cardano.org/environments/sanchonet/alonzo-genesis.json \
     https://book.world.dev.cardano.org/environments/sanchonet/conway-genesis.json \
-    https://book.world.dev.cardano.org/environments/sanchonet/config.json
+    https://book.play.dev.cardano.org/environments/sanchonet/config.json
 
 # Change config to save them in /node/log/node.log file instead of stdout
 RUN sed -i 's/StdoutSK/FileSK/' /node/configuration/config.json && \
@@ -115,14 +115,14 @@ RUN \
     "         {\n" \
     "           \"accessPoints\": [\n" \
     "               {\n" \
-    "                 \"address\": \"sanchonet-node.world.dev.cardano.org\",\n" \
-    "                 \"port\": 30004\n" \
+    "                 \"address\": \"sanchonet-node.play.dev.cardano.org\",\n" \
+    "                 \"port\": 3001\n" \
     "               }\n" \
     "             ],\n" \
     "           \"advertise\": false\n" \
     "         }\n" \
     "       ],\n" \
-    "   \"useLedgerAfterSlot\": 8877900\n" \
+    "   \"useLedgerAfterSlot\": 14601600\n" \
     "}\n" \
     > /node/configuration/topology.json ; \
     fi
@@ -131,7 +131,7 @@ RUN \
 ENV CARDANO_NODE_SOCKET_PATH="/node/ipc/node.socket"
 
 # Set mainnet magic number
-ENV MAGIC_NUMBER=2
+ENV MAGIC_NUMBER=4
 
 # Create keys, ipc, data, scripts, logs folders
 RUN mkdir -p /node/ipc /node/logs /node/pool-keys

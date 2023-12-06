@@ -50,11 +50,11 @@ RUN rm -r /src
 
 # Get latest config files
 RUN wget -P /node/configuration \
-    https://raw.githubusercontent.com/input-output-hk/cardano-world/master/docs/environments/preprod/byron-genesis.json \
-    https://raw.githubusercontent.com/input-output-hk/cardano-world/master/docs/environments/preprod/shelley-genesis.json \
-    https://raw.githubusercontent.com/input-output-hk/cardano-world/master/docs/environments/preprod/alonzo-genesis.json \
-    https://raw.githubusercontent.com/input-output-hk/cardano-world/master/docs/environments/preprod/conway-genesis.json \
-    https://raw.githubusercontent.com/input-output-hk/cardano-world/master/docs/environments/preprod/config.json
+    https://book.world.dev.cardano.org/environments/preprod/byron-genesis.json \
+    https://book.world.dev.cardano.org/environments/preprod/shelley-genesis.json \
+    https://book.world.dev.cardano.org/environments/preprod/alonzo-genesis.json \
+    https://book.world.dev.cardano.org/environments/preprod/conway-genesis.json \
+    https://book.world.dev.cardano.org/environments/preprod/config.json
 
 # Change config to save them in /node/log/node.log file instead of stdout
 RUN sed -i 's/StdoutSK/FileSK/' /node/configuration/config.json && \
@@ -102,7 +102,29 @@ RUN \
     "   \"useLedgerAfterSlot\": -1\n" \
     "}\n" \
     > /node/configuration/topology.json ; \
-    else echo " *** Incorrect Setting ***" ; \
+    else echo  "{\n" \
+    "   \"localRoots\": [\n" \
+    "         {\n" \
+    "           \"accessPoints\": [\n" \
+    "             ],\n" \
+    "           \"advertise\": false,\n" \
+    "           \"valency\": 1\n" \
+    "         }\n" \
+    "       ],\n" \
+    "   \"publicRoots\": [\n" \
+    "         {\n" \
+    "           \"accessPoints\": [\n" \
+    "               {\n" \
+    "                 \"address\": \"preprod-node.play.dev.cardano.org\",\n" \
+    "                 \"port\": 3001\n" \
+    "               }\n" \
+    "             ],\n" \
+    "           \"advertise\": false\n" \
+    "         }\n" \
+    "       ],\n" \
+    "   \"useLedgerAfterSlot\": 42855241\n" \
+    "}\n" \
+    > /node/configuration/topology.json ; \
     fi
 
 # Set node socket evironment for cardano-cli
