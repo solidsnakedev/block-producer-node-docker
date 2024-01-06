@@ -67,11 +67,13 @@ RUN cd src/blst && \
     cp bindings/blst_aux.h bindings/blst.h bindings/blst.hpp  /usr/local/include/ && \
     cp libblst.a /usr/local/lib
 
-#TODO: add conditional tag
-# ARG TAG
+ARG TAG
 
 # Clone Cardano Node and checkout to latest version
-RUN TAG=$(curl -s https://api.github.com/repos/IntersectMBO/cardano-node/releases/latest | jq -r .tag_name) && \
+RUN <<EOT 
+    [ -z ${TAG} ] \
+    && TAG=$(curl -s https://api.github.com/repos/IntersectMBO/cardano-node/releases/latest | jq -r .tag_name)
+
     echo $TAG && \
     cd src && \
     git clone https://github.com/input-output-hk/cardano-node.git && \
@@ -79,8 +81,17 @@ RUN TAG=$(curl -s https://api.github.com/repos/IntersectMBO/cardano-node/release
     git fetch --all --recurse-submodules --tags && \
     git tag | sort -V && \
     git checkout tags/${TAG}
+EOT
 
 # Build cardano-node & cardano-cli
 RUN cd src/cardano-node && \
     cabal update && \
     cabal build cardano-node cardano-cli
+
+# Find and copy binaries to ~/.local/bin
+RUN cp $(find /src/cardano-node/dist-newstyle/build -type f -name "cardano-cli") /usr/local/bin/cardano-cli
+RUN cp $(find /src/cardano-node/dist-newstyle/build -type f -name "cardano-node") /usr/local/bin/cardano-node
+
+FROM ubuntu:latest
+COPY --from=builder /usr/local/bin/cardano-cli /usr/local/bin
+COPY --from=builder /usr/local/bin/cardano-node /usr/local/bin
