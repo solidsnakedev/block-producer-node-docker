@@ -3,13 +3,13 @@ services:
   builder:
     build:
       context: .
-      dockerfile: Dockerfile.builder
+      dockerfile: ../Dockerfile.builder
     image: builder
 
   node:
     build:
       context: .
-      dockerfile: Dockerfile.node
+      dockerfile: ../Dockerfile.node
     image: node
     depends_on:
       - builder
