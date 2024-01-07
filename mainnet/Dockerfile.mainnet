@@ -32,8 +32,8 @@ RUN <<EOT
           "localRoots": [
             {
               "accessPoints": [
-                {"address": $relay1_ip, "port": $relay1_port},
-                {"address": $relay2_ip, "port": $relay2_port}
+                {"address": $relay1_ip, "port": $relay1_port | tonumber },
+                {"address": $relay2_ip, "port": $relay2_port | tonumber }
               ],
               "advertise": false,
               "valency": 1
@@ -50,7 +50,7 @@ RUN <<EOT
           "localRoots": [
             {
               "accessPoints": [
-                {"address": $relay1_ip, "port": $relay1_port}
+                {"address": $relay1_ip, "port": $relay1_port | tonumber }
               ],
               "advertise": false,
               "valency": 1
