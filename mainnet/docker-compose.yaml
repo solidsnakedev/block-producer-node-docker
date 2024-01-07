@@ -1,7 +1,23 @@
 services:
 
+  builder:
+    build:
+      context: .
+      dockerfile: ../Dockerfile.builder
+    image: builder
+
+  node:
+    build:
+      context: .
+      dockerfile: ../Dockerfile.node
+    image: node
+    depends_on:
+      - builder
+
   cardano-node-bp-mainnet:
-    build: .
+    build: 
+      context: .
+      dockerfile: Dockerfile.mainnet
     image: cardano-node-bp-mainnet
     container_name: cardano-node-bp-mainnet
     ports:
@@ -13,6 +29,8 @@ services:
       - ./node/logs/:/node/logs
       - ./node/pool-keys:/node/pool-keys
       - ./node/data:/node/data
+    depends_on:
+      - node
 
   node-exporter-mainnet: # Listening by default on port 9100
     image: quay.io/prometheus/node-exporter:latest
