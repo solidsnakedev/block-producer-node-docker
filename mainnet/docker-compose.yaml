@@ -3,13 +3,13 @@ services:
   builder:
     build:
       context: .
-      dockerfile: ../Dockerfile.builder
+      dockerfile: ../builder.Dockerfile
     image: builder
 
   node:
     build:
       context: .
-      dockerfile: ../Dockerfile.node
+      dockerfile: ../node.Dockerfile
     image: node
     depends_on:
       - builder
@@ -17,7 +17,7 @@ services:
   cardano-node-bp-mainnet:
     build: 
       context: .
-      dockerfile: Dockerfile.mainnet
+      dockerfile: mainnet.Dockerfile
     image: cardano-node-bp-mainnet
     container_name: cardano-node-bp-mainnet
     ports:
