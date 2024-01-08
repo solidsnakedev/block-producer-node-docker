@@ -9,11 +9,15 @@ RUN wget -P /node/configuration \
   https://raw.githubusercontent.com/input-output-hk/cardano-playground/main/static/book.play.dev.cardano.org/environments/mainnet/conway-genesis.json \
   https://raw.githubusercontent.com/input-output-hk/cardano-playground/main/static/book.play.dev.cardano.org/environments/mainnet/config.json
 
+
+# TODO: add jq
 # Change config to save them in /node/log/node.log file instead of stdout
 RUN sed -i 's/StdoutSK/FileSK/' /node/configuration/config.json && \
   sed -i 's/stdout/\/node\/logs\/node.log/' /node/configuration/config.json && \
   sed -i 's/\"TraceBlockFetchDecisions\": false/\"TraceBlockFetchDecisions\": true/' /node/configuration/config.json && \
   sed -i 's/\"127.0.0.1\"/\"0.0.0.0\"/' /node/configuration/config.json
+
+RUN echo $(jq '.TraceMempool|=true' /node/configuration/config.json) > /node/configuration/config.json
 
 ARG RELAY1_IP
 ARG RELAY1_PORT
