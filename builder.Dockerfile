@@ -76,7 +76,7 @@ RUN <<EOT
 
     echo $TAG && \
     cd src && \
-    git clone https://github.com/input-output-hk/cardano-node.git && \
+    git clone https://github.com/IntersectMBO/cardano-node.git && \
     cd cardano-node && \
     git fetch --all --recurse-submodules --tags && \
     git tag | sort -V && \
