@@ -11,8 +11,8 @@ ARG TAG
 
 RUN <<EOT
     [ -z ${TAG} ] \
-    && URL=$(curl -s https://api.github.com/repos/input-output-hk/cardano-node/releases/latest | jq -r '.assets[] | select(.name | contains("linux")) | .browser_download_url') \
-    || URL=$( curl -s https://api.github.com/repos/input-output-hk/cardano-node/releases/tags/${TAG} | jq -r '.assets[] | select(.name | contains("linux")) | .browser_download_url')
+    && URL=$(curl -s https://api.github.com/repos/IntersectMBO/cardano-node/releases/latest | jq -r '.assets[] | select(.name | contains("linux")) | .browser_download_url') \
+    || URL=$( curl -s https://api.github.com/repos/IntersectMBO/cardano-node/releases/tags/${TAG} | jq -r '.assets[] | select(.name | contains("linux")) | .browser_download_url')
 
     cd src && \
     wget -cO - ${URL} > cardano-node.tar.gz && \
