@@ -15,13 +15,13 @@ ENV PKG_CONFIG_PATH="/usr/local/lib/pkgconfig:$PKG_CONFIG_PATH"
 
 # Install libsodium
 RUN cd src && \
-  git clone https://github.com/input-output-hk/libsodium && \
-  cd libsodium && \
-  git checkout dbb48cc && \
-  ./autogen.sh && \
-  ./configure && \
-  make && \
-  make install
+    git clone https://github.com/IntersectMBO/libsodium && \
+    cd libsodium && \
+    git checkout dbb48cc && \
+    ./autogen.sh && \
+    ./configure && \
+    make && \
+    make install
 
 #Install libsecp256k1
 RUN cd src && \
