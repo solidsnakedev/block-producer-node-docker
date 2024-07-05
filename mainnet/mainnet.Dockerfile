@@ -33,6 +33,7 @@ RUN <<EOT
         --arg relay2_ip "$RELAY2_IP" \
         --arg relay2_port "$RELAY2_PORT" \
         '{
+          "bootstrapPeers": [],
           "localRoots": [
             {
               "accessPoints": [
@@ -40,10 +41,16 @@ RUN <<EOT
                 {"address": $relay2_ip, "port": $relay2_port | tonumber }
               ],
               "advertise": false,
-              "valency": 1
+              "trustable": true,
+              "valency": 2
             }
           ],
-          "publicRoots": [],
+          "publicRoots": [
+            {
+              "accessPoints": [],
+              "advertise": false
+            }
+          ],
           "useLedgerAfterSlot": -1
         }' > /node/configuration/topology.json
     elif [ -n "${RELAY1_IP}" ] && [ -n "${RELAY1_PORT}" ] ; then \
@@ -51,16 +58,23 @@ RUN <<EOT
         --arg relay1_ip "$RELAY1_IP" \
         --arg relay1_port "$RELAY1_PORT" \
         '{
+          "bootstrapPeers": [],
           "localRoots": [
             {
               "accessPoints": [
                 {"address": $relay1_ip, "port": $relay1_port | tonumber }
               ],
               "advertise": false,
+              "trustable": true,
               "valency": 1
             }
           ],
-          "publicRoots": [],
+          "publicRoots": [
+            {
+              "accessPoints": [],
+              "advertise": false
+            }
+          ],
           "useLedgerAfterSlot": -1
         }' > /node/configuration/topology.json
     else 
