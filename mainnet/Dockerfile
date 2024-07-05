@@ -103,91 +103,55 @@ ARG RELAY2_PORT
 
 # Set topology
 RUN <<EOT
-    if [ -n "${RELAY1_IP}" ] && [ -n "${RELAY1_PORT}" ] && [ -n "${RELAY2_IP}" ] && [ -n "${RELAY2_PORT}" ] ; then \
-        jq -n \
-        --arg relay1_ip "$RELAY1_IP" \
-        --arg relay1_port "$RELAY1_PORT" \
-        --arg relay2_ip "$RELAY2_IP" \
-        --arg relay2_port "$RELAY2_PORT" \
-        '{
-          "bootstrapPeers": [],
-          "localRoots": [
-            {
-              "accessPoints": [
-                {"address": $relay1_ip, "port": $relay1_port | tonumber },
-                {"address": $relay2_ip, "port": $relay2_port | tonumber }
-              ],
-              "advertise": false,
-              "trustable": true,
-              "valency": 2
-            }
-          ],
-          "publicRoots": [
-            {
-              "accessPoints": [],
-              "advertise": false
-            }
-          ],
-          "useLedgerAfterSlot": -1
-        }' > /node/configuration/topology.json
-    elif [ -n "${RELAY1_IP}" ] && [ -n "${RELAY1_PORT}" ] ; then \
-        jq -n \
-        --arg relay1_ip "$RELAY1_IP" \
-        --arg relay1_port "$RELAY1_PORT" \
-        '{
-          "bootstrapPeers": [],
-          "localRoots": [
-            {
-              "accessPoints": [
-                {"address": $relay1_ip, "port": $relay1_port | tonumber }
-              ],
-              "advertise": false,
-              "trustable": true,
-              "valency": 1
-            }
-          ],
-          "publicRoots": [
-            {
-              "accessPoints": [],
-              "advertise": false
-            }
-          ],
-          "useLedgerAfterSlot": -1
-        }' > /node/configuration/topology.json
-    else 
-      jq -n \
-        '{
-          "bootstrapPeers": [],
-          "localRoots": [
-            {
-              "accessPoints": [],
-              "advertise": false,
-              "valency": 1
-            }
-          ],
-          "publicRoots": [
-            {
-              "accessPoints": [
+    if [ -n "${RELAY1_IP}" ] && [ -n "${RELAY1_PORT}" ] && [ -n "${RELAY2_IP}" ] && [ -n "${RELAY2_PORT}" ]; then
+        jq -n --arg relay1_ip "$RELAY1_IP" --arg relay1_port "$RELAY1_PORT" --arg relay2_ip "$RELAY2_IP" --arg relay2_port "$RELAY2_PORT" '{
+            "bootstrapPeers": [],
+            "localRoots": [
                 {
-                  "address": "backbone.cardano-mainnet.iohk.io",
-                  "port": 3001
-                },
-                {
-                  "address": "backbone.cardano.iog.io",
-                  "port": 3001
-                },
-                {
-                  "address": "backbone.mainnet.emurgornd.com",
-                  "port": 3001
+                    "accessPoints": [
+                        {"address": $relay1_ip, "port": ($relay1_port | tonumber)},
+                        {"address": $relay2_ip, "port": ($relay2_port | tonumber)}
+                    ],
+                    "advertise": false,
+                    "trustable": true,
+                    "valency": 2
                 }
-              ],
-              "advertise": false
-            }
-          ],
-          "useLedgerAfterSlot": 110332824
-        }' > /node/configuration/topology.json 
+            ],
+            "publicRoots": [{"accessPoints": [], "advertise": false}],
+            "useLedgerAfterSlot": -1
+        }' > /node/configuration/topology.json
+    elif [ -n "${RELAY1_IP}" ] && [ -n "${RELAY1_PORT}" ]; then
+        jq -n --arg relay1_ip "$RELAY1_IP" --arg relay1_port "$RELAY1_PORT" '{
+            "bootstrapPeers": [],
+            "localRoots": [
+                {
+                    "accessPoints": [{"address": $relay1_ip, "port": ($relay1_port | tonumber)}],
+                    "advertise": false,
+                    "trustable": true,
+                    "valency": 1
+                }
+            ],
+            "publicRoots": [{"accessPoints": [], "advertise": false}],
+            "useLedgerAfterSlot": -1
+        }' > /node/configuration/topology.json
+    else
+        jq -n '{
+            "bootstrapPeers": [],
+            "localRoots": [
+                {"accessPoints": [], "advertise": false, "valency": 1}
+            ],
+            "publicRoots": [
+                {"accessPoints": [
+                    {"address": "backbone.cardano-mainnet.iohk.io", "port": 3001},
+                    {"address": "backbone.cardano.iog.io", "port": 3001},
+                    {"address": "backbone.mainnet.emurgornd.com", "port": 3001}
+                ], "advertise": false}
+            ],
+            "useLedgerAfterSlot": 110332824
+        }' > /node/configuration/topology.json
     fi
 EOT
+
 
 # Set network for cardano-cli commands
 ENV NETWORK="--mainnet"
