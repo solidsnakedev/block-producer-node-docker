@@ -1,5 +1,5 @@
 # syntax=docker/dockerfile:1
-FROM ubuntu:latest
+FROM ubuntu:22.04
 
 # Install Cardano dependencies and tools
 RUN apt-get update -y && \
