@@ -157,6 +157,7 @@ RUN <<EOT
     else 
       jq -n \
         '{
+          "bootstrapPeers": [],
           "localRoots": [
             {
               "accessPoints": [],
