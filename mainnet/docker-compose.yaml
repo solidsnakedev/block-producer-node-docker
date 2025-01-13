@@ -1,8 +1,6 @@
 services:
-
   cardano-node-bp-mainnet:
-    build: .
-    image: cardano-node-bp-mainnet
+    image: ghcr.io/intersectmbo/cardano-node:10.1.4
     container_name: cardano-node-bp-mainnet
     ports:
       - 6000:6000 # Cardano node relay port
@@ -10,11 +8,17 @@ services:
     volumes:
       - ./node/db/:/node/db
       - ./node/ipc/:/node/ipc
-      - ./node/logs/:/node/logs
       - ./node/pool-keys:/node/pool-keys
-      - ./node/data:/node/data
+      - ./node/configuration:/node/configuration
+      - ./scripts:/scripts
+    environment:
+      - NETWORK=--mainnet
+      - MAGIC_NUMBER=764824073
+      - CARDANO_NODE_SOCKET_PATH=/node/ipc/node.socket
+    restart: always
+    entrypoint: ./scripts/run-cardano-node.sh
 
-  node-exporter-preprod: # Listening by default on port 9100
+  node-exporter-mainnet: # Listening by default on port 9100
     image: quay.io/prometheus/node-exporter:latest
     container_name: node-exporter-mainnet
     ports:
